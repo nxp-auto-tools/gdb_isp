@@ -1,14 +1,14 @@
 /*
  * Copyrights
  */
+#include "sysdep.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "sysdep.h"
 #include "dis-asm.h"
 #include "apex-opc.h"
 #include "apex-dis.h"
 #include "elf-bfd.h"
-#include "common/errors.h"
+#include "../gdb/common/errors.h"
 
 typedef struct operand{
 	bfd_vma value;
@@ -16,7 +16,12 @@ typedef struct operand{
 }operand;
 extern const apex_opc_info_t const * const apex_APC_32b_scalar_opc_info;
 
-instruction_type get_instruction_type (bfd_vma instruction_word){ //read first two bit in instruction
+int get_instruction_type (bfd_vma instruction_word);
+apex_opc_info_t* finde_in_table (apex_opc_info_t* table, bfd_vma data);
+unsigned int extract_operands (apex_opc_info_t* operation,operand* operands,bfd_vma data);
+int compose_disasmed_string (apex_opc_info_t* instruction,operand* operands,char* string);
+
+int get_instruction_type (bfd_vma instruction_word){ //read first two bit in instruction
 	instruction_word >>= 30;
 	switch (instruction_word){
 	case 0:
@@ -32,33 +37,45 @@ instruction_type get_instruction_type (bfd_vma instruction_word){ //read first t
 		return wrong_insruction_type;
 	}
 }
-apex_opc_info_t finde_in_table (apex_opc_info_t* table, bfd_vma data){ // brute force yet
+apex_opc_info_t* finde_in_table (apex_opc_info_t* table, bfd_vma data){ // brute force yet
 	for(;table->name;table++)
-		if ((data & ~table.op_pos & ~table.non_read_pos) == table.opcode)
+		if ((data & ~table->op_pos & ~table->non_read_pos) == table->opcode)
 			return table;
 	return NULL;
 }
 
-unsigned int extract_operands (apex_opc_info_t operation,operand* operands,bfd_vma data){
+unsigned int extract_operands (apex_opc_info_t* operation,operand* operands,bfd_vma data){
 
+	int index;
 	bfd_vma op_mask[5];
 	unsigned char positions_to_shift[5];
 
 	memset (op_mask, 0, 5*sizeof(bfd_vma));
 	memset (positions_to_shift, 0, 5);
 
-	switch(operation.op_pos){ // compare operands mask
-
+	switch(operation->op_pos){ // compare operands mask
 	case first_scalar_operands_mask_type:
-		/*OPERAND_FIRST|OPERAND_SECOND|OPERAND_C*/
-		op_mask[0]=OPERAND_FIRST;
-		op_mask[1]=OPERAND_SECOND;
-		op_mask[2]=OPERAND_C;
-		positions_to_shift[0]=20;
-		positions_to_shift[1]=15;
-		positions_to_shift[2]=0;
+		switch(operation->num_of_operands){
+		case 1:	/*OPERAND_LARGE_IMM*/
+			op_mask[0]=OPERAND_LARGE_IMM;
+			positions_to_shift[0]=0;
+			break;
+		case 2:	/*OPERAND_I1|OPERAND_I2*/
+			op_mask[0]=OPERAND_I1;
+			op_mask[1]=OPERAND_I2;
+			positions_to_shift[0]=13;
+			positions_to_shift[1]=0;
+			break;
+		case 3:/*OPERAND_FIRST|OPERAND_SECOND|OPERAND_C*/
+			op_mask[0]=OPERAND_FIRST;
+			op_mask[1]=OPERAND_SECOND;
+			op_mask[2]=OPERAND_C;
+			positions_to_shift[0]=20;
+			positions_to_shift[1]=15;
+			positions_to_shift[2]=0;
+			break;
+		}
 		break;
-
 	case second_scalar_operands_mask_type:
 		/*OPERAND_FIRST|OPERAND_SECOND|OPERAND_THIRD*/
 		op_mask[0]=OPERAND_FIRST;
@@ -121,11 +138,7 @@ unsigned int extract_operands (apex_opc_info_t operation,operand* operands,bfd_v
 		positions_to_shift[1]=9;
 		break;
 
-	case ninth_scalar_operands_mask_type:
-		/*OPERAND_LARGE_IMM*/
-		op_mask[0]=OPERAND_LARGE_IMM;
-		positions_to_shift[0]=0;
-		break;
+	//case ninth_scalar_operands_mask_type:
 
 	case tenth_scalar_operands_mask_type:
 		/*OPERAND_FIRST*/
@@ -139,13 +152,7 @@ unsigned int extract_operands (apex_opc_info_t operation,operand* operands,bfd_v
 		positions_to_shift[0]=15;
 		break;
 
-	case twelfth_scalar_operands_mask_type:
-		/*OPERAND_I1|OPERAND_I2*/
-		op_mask[0]=OPERAND_I1;
-		op_mask[1]=OPERAND_I2;
-		positions_to_shift[0]=13;
-		positions_to_shift[1]=0;
-		break;
+	//case twelfth_scalar_operands_mask_type:
 
 	case thirteenth_scalar_operands_mask_type:
 		/*OPERAND_IMM*/
@@ -159,22 +166,25 @@ unsigned int extract_operands (apex_opc_info_t operation,operand* operands,bfd_v
 		operands=NULL;
 		return -1;
 	}
-	operands = malloc(sizeof(operand)*operation.num_of_operands);
+	operands = malloc(sizeof(operand)*operation->num_of_operands);
 	if (operands==NULL){
 		return -1;
 	}
-	for (unsigned char i=0; i<operation.num_of_operands;i++){
-		operands[i].type = operation.op_type[i];
-		operands[i].value = SHIFT_RIGHT((data & op_mask[i]), positions_to_shift[i]);
+	for (index=0; index<operation->num_of_operands;index++){
+		operands[index].type = operation->op_type[index];
+		operands[index].value = SHIFT_RIGHT((data & op_mask[index]), positions_to_shift[index]);
 	}
 	return 0;
 
 }
-int compose_disasmed_string (apex_opc_info_t instruction,operand* operands,const char* string){
-
+int compose_disasmed_string (apex_opc_info_t* instruction,operand* operands, char* string){
+	int index;
 	strcat(string, instruction->name);
-	for (int i=0;i<instruction.num_of_operands;i++){
-		switch(operands[i].type){
+	for (index=0;index<instruction->num_of_operands;index++){
+		switch(operands[index].type){
+		case gap:
+			strcat(string," _g_");
+			break;
 		case reg_t:
 			strcat(string," r");
 			break;
@@ -182,7 +192,7 @@ int compose_disasmed_string (apex_opc_info_t instruction,operand* operands,const
 			strcat(string," #");
 			break;
 		}
-	sprintf(string,"%d",operands[i].value);
+	sprintf(string,"%ll",operands[index].value);
 	}
 	return strlen(string);
 }
@@ -192,9 +202,9 @@ print_insn_apex(bfd_vma pc, disassemble_info *info){
 	bfd_byte instr_low_bytes [word_instruction_length];
 	bfd_byte instr_high_bytes [word_instruction_length];
 	apex_opc_info_t* opcode_table;
-	apex_opc_info_t current_instruction;
+	apex_opc_info_t* current_instruction;
 	operand* operands; //dynamic!!! to free!
-	const char* instr_string_shape[64];
+	char instr_string_shape[64];
 
     // read instruction-word at address pointed by "pc"
     int status = (*info->read_memory_func) (pc, instr_low_bytes,

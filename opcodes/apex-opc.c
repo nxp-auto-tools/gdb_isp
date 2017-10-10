@@ -3,7 +3,7 @@
  */
 
 
-//#include "sysdep.h"
+#include "sysdep.h"
 #include "apex-opc.h"
 
 const apex_opc_info_t apex_APC_32b_scalar_opc_info[] =
@@ -149,9 +149,9 @@ const apex_opc_info_t apex_APC_32b_scalar_opc_info[] =
 	{       	/*On-Chip debugger Instructions*/
 			 "mv", 0x0000002EU, 1, {reg_t,gap,gap,gap,gap}, OPERAND_SECOND,0x1F07F00},
 	{     "sltui", 0x0000002DU, 1, {reg_t,gap,gap,gap,gap}, OPERAND_FIRST,0xFFF00},
-	{ NULL,NULL, 0, 0, 0}
+	{ NULL,0,0,NULL,0,0}
 };
-
+#if 0
 const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 {
 				/*Vector Stack Instructions*/
@@ -407,7 +407,7 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{      "vsle", 0x00000000U, 0x00000000U},
 	{ NULL, 0, 0, 0}
 };
-
+#endif
 /*Scalar-Vector combined instructions*/
 //TODO:
 
