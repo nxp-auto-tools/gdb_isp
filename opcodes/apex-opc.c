@@ -149,7 +149,7 @@ const apex_opc_info_t apex_APC_32b_scalar_opc_info[] =
 	{       	/*On-Chip debugger Instructions*/
 			 "mv", 0x0000002EU, 1, {reg_t,gap,gap,gap,gap}, OPERAND_SECOND,0x1F07F00},
 	{     "sltui", 0x0000002DU, 1, {reg_t,gap,gap,gap,gap}, OPERAND_FIRST,0xFFF00},
-	{ NULL,0,0,NULL,0,0}
+	{ NULL,0,0,{0,0,0,0,0},0,0}
 };
 #if 0
 const apex_opc_info_t apex_APC_32b_vector_opc_info[] =

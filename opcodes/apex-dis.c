@@ -14,12 +14,12 @@ typedef struct operand{
 	bfd_vma value;
 	operand_type type;
 }operand;
-extern const apex_opc_info_t const * const apex_APC_32b_scalar_opc_info;
+extern const apex_opc_info_t* apex_APC_32b_scalar_opc_info;
 
 int get_instruction_type (bfd_vma instruction_word);
-apex_opc_info_t* finde_in_table (apex_opc_info_t* table, bfd_vma data);
-unsigned int extract_operands (apex_opc_info_t* operation,operand* operands,bfd_vma data);
-int compose_disasmed_string (apex_opc_info_t* instruction,operand* operands,char* string);
+const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data);
+int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma data);
+int compose_disasmed_string (const apex_opc_info_t* instruction,operand* operands,char* string);
 
 int get_instruction_type (bfd_vma instruction_word){ //read first two bit in instruction
 	instruction_word >>= 30;
@@ -37,14 +37,14 @@ int get_instruction_type (bfd_vma instruction_word){ //read first two bit in ins
 		return wrong_insruction_type;
 	}
 }
-apex_opc_info_t* finde_in_table (apex_opc_info_t* table, bfd_vma data){ // brute force yet
+const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data){ // brute force yet
 	for(;table->name;table++)
 		if ((data & ~table->op_pos & ~table->non_read_pos) == table->opcode)
 			return table;
 	return NULL;
 }
 
-unsigned int extract_operands (apex_opc_info_t* operation,operand* operands,bfd_vma data){
+int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma data){
 
 	int index;
 	bfd_vma op_mask[5];
@@ -177,7 +177,7 @@ unsigned int extract_operands (apex_opc_info_t* operation,operand* operands,bfd_
 	return 0;
 
 }
-int compose_disasmed_string (apex_opc_info_t* instruction,operand* operands, char* string){
+int compose_disasmed_string (const apex_opc_info_t* instruction,operand* operands, char* string){
 	int index;
 	strcat(string, instruction->name);
 	for (index=0;index<instruction->num_of_operands;index++){
@@ -192,7 +192,7 @@ int compose_disasmed_string (apex_opc_info_t* instruction,operand* operands, cha
 			strcat(string," #");
 			break;
 		}
-	sprintf(string,"%ll",operands[index].value);
+	sprintf(string,"%d",operands[index].value);//TODO:warning about bfd_vma is not int
 	}
 	return strlen(string);
 }
@@ -200,9 +200,9 @@ int
 print_insn_apex(bfd_vma pc, disassemble_info *info){
 
 	bfd_byte instr_low_bytes [word_instruction_length];
-	bfd_byte instr_high_bytes [word_instruction_length];
-	apex_opc_info_t* opcode_table;
-	apex_opc_info_t* current_instruction;
+	// bfd_byte instr_high_bytes [word_instruction_length];
+	const apex_opc_info_t* opcode_table;
+	const apex_opc_info_t* current_instruction;
 	operand* operands; //dynamic!!! to free!
 	char instr_string_shape[64];
 
@@ -250,10 +250,15 @@ print_insn_apex(bfd_vma pc, disassemble_info *info){
     	error("Can't extract operands!\n");
     	return -1;
     }
-    if(compose_disasmed_string(current_instruction,operands,instr_string_shape)<=0){
-    	error("Error while composing string!\n");
+    if (operands==NULL){
+    	error ("For some reason operands are empty");
     	return -1;
-    }
+    }else
+		if(compose_disasmed_string(current_instruction,operands,instr_string_shape)<=0){
+			error("Error while composing string!\n");
+			return -1;
+		}
+    info->fprintf_func(info->stream, instr_string_shape);
     free(operands);
 	return 0;
 }
