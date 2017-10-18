@@ -1,5 +1,5 @@
 /* Select disassembly routine for specified architecture.
-   Copyright (C) 1994-2016 Free Software Foundation, Inc.
+   Copyright (C) 1994-2015 Free Software Foundation, Inc.
 
    This file is part of the GNU opcodes library.
 
@@ -24,6 +24,7 @@
 #ifdef ARCH_all
 #define ARCH_aarch64
 #define ARCH_alpha
+#define ARCH_apex
 #define ARCH_arc
 #define ARCH_arm
 #define ARCH_avr
@@ -91,6 +92,7 @@
 #define ARCH_v850
 #define ARCH_vax
 #define ARCH_visium
+#define ARCH_vspa
 #define ARCH_w65
 #define ARCH_xstormy16
 #define ARCH_xc16x
@@ -106,7 +108,8 @@
 #endif
 
 disassembler_ftype
-disassembler (bfd *abfd)
+disassembler (abfd)
+     bfd *abfd;
 {
   enum bfd_architecture a = bfd_get_arch (abfd);
   disassembler_ftype disassemble;
@@ -124,6 +127,11 @@ disassembler (bfd *abfd)
     case bfd_arch_alpha:
       disassemble = print_insn_alpha;
       break;
+#endif
+#ifdef ARCH_apex
+    case bfd_arch_apex:
+	  disassemble = print_insn_apex;
+	  break;
 #endif
 #ifdef ARCH_arc
     case bfd_arch_arc:
@@ -505,6 +513,11 @@ disassembler (bfd *abfd)
        disassemble = print_insn_visium;
        break;
 #endif
+#ifdef ARCH_vspa
+     case bfd_arch_vspa:
+       disassemble = print_insn_vspa;
+       break;
+#endif
 #ifdef ARCH_frv
     case bfd_arch_frv:
       disassemble = print_insn_frv;
@@ -542,13 +555,11 @@ disassembler (bfd *abfd)
 }
 
 void
-disassembler_usage (FILE *stream ATTRIBUTE_UNUSED)
+disassembler_usage (stream)
+     FILE * stream ATTRIBUTE_UNUSED;
 {
 #ifdef ARCH_aarch64
   print_aarch64_disassembler_options (stream);
-#endif
-#ifdef ARCH_arc
-  print_arc_disassembler_options (stream);
 #endif
 #ifdef ARCH_arm
   print_arm_disassembler_options (stream);
@@ -582,6 +593,12 @@ disassemble_init_for_target (struct disassemble_info * info)
       info->symbol_is_valid = aarch64_symbol_is_valid;
       info->disassembler_needs_relocs = TRUE;
       break;
+#endif
+#ifdef ARCH_apex
+    case bfd_arch_apex:
+    	info->endian = BFD_ENDIAN_LITTLE;
+    	info->endian_code = BFD_ENDIAN_LITTLE;
+    	info->display_endian = BFD_ENDIAN_LITTLE;
 #endif
 #ifdef ARCH_arm
     case bfd_arch_arm:

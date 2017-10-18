@@ -65,11 +65,11 @@ typedef enum operand_type{
 typedef struct apex_opc_info_t
 {
   const char *name;
-  unsigned long long opcode;
-  unsigned char num_of_operands;
+  unsigned long opcode;
+  unsigned int num_of_operands;
   operand_type op_type[5];
-  unsigned long long op_pos; //operands positions
-  unsigned long long non_read_pos; //positions of instr, that not reads by.
+  unsigned long op_pos; //operands positions
+  unsigned long non_read_pos; //positions of instr, that not reads by.
 
 } apex_opc_info_t;
 

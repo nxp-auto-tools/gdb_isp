@@ -45,6 +45,11 @@
 /* The gdbarch_tdep structure.  */
 
 /*! APEX specific per-architecture information.*/
+enum apex_base_addr{
+	apex_0 = 0x74000000,
+	apex_1 = 0x78000000
+}apex_base_addr;
+//enum
 struct gdbarch_tdep
 {
   unsigned int  num_matchpoints;	/* Total h/w breakpoints available. */
@@ -143,8 +148,11 @@ apex_breakpoint_from_pc (struct gdbarch *gdbarch,
 static CORE_ADDR
 apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame)
 {
+	/*TODO: pc mapping: pc*word_length(4)+APEX_BASE_ADDR(0x74000000)+APU_BASE_ADDR(0x8000)*/
+
   CORE_ADDR pc
     = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
+//  pc = pc*4+0x74000000;
 
   return pc;
 }
