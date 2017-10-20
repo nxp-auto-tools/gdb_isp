@@ -197,16 +197,13 @@ int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma
 		operands[index].value = SHIFT_RIGHT((data & op_mask[index]), positions_to_shift[index]);
 	}
 	return 0;
-
 }
+
 int compose_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
 	int index;
 	const char* value_string [8];
 	memset (value_string,0,8);
-	//fprintf(stderr, "_compose_disasmed_string_ _begin_ %s\n",string);
 	strcat(string, instruction->name);
-	//fprintf(stderr, "_compose_disasmed_string_ _name_added_ %s\n",string);
-
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
 		case gap:
@@ -214,25 +211,28 @@ int compose_mnemonic (const apex_opc_info_t* instruction,operand* operands, char
 			break;
 		case reg_t:
 			strcat(string," r");
+			sprintf(value_string,"%d",operands[index].value);
 			break;
 		case imm_t:
 			strcat(string," #");
+			sprintf(value_string,"0x%08x",operands[index].value);
 			break;
 		}
-		//fprintf(stderr, "_compose_disasmed_string_ _op_type_added_ %s\n",string);
-
-	sprintf(value_string,"%d",operands[index].value);//TODO:warning about bfd_vma is not int
 	strcat(string,value_string);
-	//fprintf(stderr, "_compose_disasmed_string_ _op_val_added_ %s\n",string);
-
 	}
 	return strlen(string);
 }
-int
-print_insn_apex(bfd_vma pc, disassemble_info *info){
 
-	//bfd_vma real_pc=pc;
-	////fprintf(stderr, "PC = %x",pc);
+int
+print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
+
+	bfd_vma mask1 = 0x8000;
+	bfd_vma mask2 = 0x2000;
+	bfd_vma mask3 = 0x6000;
+	bfd_vma mask4 = 0x18000;
+
+	//bfd_vma insn_order_num = (cur_insn_addr & ~(mask1|mask2|mask3|mask4));
+	//cur_insn_addr =	 (cur_insn_addr - insn_order_num) + insn_order_num*4;
 	bfd_byte instr_low_bytes [word_instruction_length];
 	// bfd_byte instr_high_bytes [word_instruction_length];
 	const apex_opc_info_t* opcode_table;
@@ -245,13 +245,13 @@ print_insn_apex(bfd_vma pc, disassemble_info *info){
 	memset(operands,0,5*sizeof(operands[0]));
 
     // read instruction-word at address pointed by "pc"
-	int status = (*info->read_memory_func) (pc, instr_low_bytes,
+	int status = (*info->read_memory_func) (cur_insn_addr, instr_low_bytes,
     									word_instruction_length, info);
 
     if (status != 0)
     {
-      (*info->memory_error_func) (status, pc, info);
-      //fprintf (stderr,"memory read func worked in wrong way\n");
+      (*info->memory_error_func) (status, cur_insn_addr, info);
+      fprintf (stderr,"memory read func worked in wrong way\n");
       return -1;
     }
     // read next instruction-word at address pointed by "pc+1"
@@ -264,11 +264,8 @@ print_insn_apex(bfd_vma pc, disassemble_info *info){
     }*/
 
     bfd_vma data = bfd_get_bits (instr_low_bytes, word_instruction_length * 8, info->display_endian == BFD_ENDIAN_LITTLE);
-    //bfd_vma data =  0x06020000;
-    //fprintf(stderr,"instruction: %8x\n",data);
     switch (get_instruction_type(data)){
     case scalar_instruction_type:
-        //fprintf(stderr,"scalar_instruction_type\n",data);
     	opcode_table = apex_APC_32b_scalar_opc_info;
     	break;
     case vector_instruction_type:
@@ -278,30 +275,27 @@ print_insn_apex(bfd_vma pc, disassemble_info *info){
     case scalar64_instruction_type:
    // 	break;
     default:
-    	//error ("Wrong instruction type");
-    	//fprintf (stderr,"Wrong instruction type\n",NULL);
+    	fprintf (stderr,"Wrong instruction type\n",NULL);
     	break;
 
     }
     current_instruction = finde_in_table(opcode_table,data);
     if (current_instruction == NULL){
-    	//error("can't find in table this instruction!\n");
-    	//fprintf (stderr,"can't find this instruction in table!\n",NULL);
+    	fprintf (stderr,"can't find this instruction in table!\n",NULL);
+        info->fprintf_func(info->stream, "0x%08x",data);
+    	return word_instruction_length;
+
     }
 
     if(extract_operands(current_instruction,operands,data)<0){
-    	//error("Can't extract operands!\n");
-    	//fprintf (stderr,"Can't extract operands!\n",NULL);
+    	fprintf (stderr,"\tNext instruction have no operands:\n",NULL);
     }
     if (operands==NULL){
-    	//error ("For some reason operands are empty\n");
-    	//fprintf (stderr,"For some reason operands are empty\n",NULL);
+    	fprintf (stderr,"For some reason operands are empty\n",NULL);
     }else
 		if(compose_mnemonic(current_instruction,operands,instr_string_shape)<=0){
-			//error("Error while composing string!\n");
-	    	//fprintf (stderr,"Error while composing string!\n",NULL);
+	    	fprintf (stderr,"Error while composing string!\n",NULL);
 		}
     info->fprintf_func(info->stream, instr_string_shape);
-    //xfree(operands);
 	return word_instruction_length;
 }

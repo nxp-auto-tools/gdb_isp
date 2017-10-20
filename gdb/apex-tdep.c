@@ -148,11 +148,10 @@ apex_breakpoint_from_pc (struct gdbarch *gdbarch,
 static CORE_ADDR
 apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame)
 {
-	/*TODO: pc mapping: pc*word_length(4)+APEX_BASE_ADDR(0x74000000)+APU_BASE_ADDR(0x8000)*/
+	/*TODO: pc mapping: pc*word_length(4)+APEX_BASE_ADDR(0x74000000)*/
 
   CORE_ADDR pc
     = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
-//  pc = pc*4+0x74000000;
 
   return pc;
 }
