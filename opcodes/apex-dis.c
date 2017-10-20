@@ -263,7 +263,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     case scalar64_instruction_type:
    // 	break;
     default:
-    	fprintf (stderr,"Wrong instruction type\n",NULL);
+    	//fprintf (stderr,"Wrong instruction type\n",NULL);
     	break;
     }
 
