@@ -92,7 +92,6 @@
 #define ARCH_v850
 #define ARCH_vax
 #define ARCH_visium
-#define ARCH_vspa
 #define ARCH_w65
 #define ARCH_xstormy16
 #define ARCH_xc16x
@@ -511,11 +510,6 @@ disassembler (abfd)
 #ifdef ARCH_visium
      case bfd_arch_visium:
        disassemble = print_insn_visium;
-       break;
-#endif
-#ifdef ARCH_vspa
-     case bfd_arch_vspa:
-       disassemble = print_insn_vspa;
        break;
 #endif
 #ifdef ARCH_frv

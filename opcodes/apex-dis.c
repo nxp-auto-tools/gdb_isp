@@ -21,6 +21,7 @@ int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma
 int compose_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string);
 
 int get_instruction_type (bfd_vma instruction_word){ //read first two bit in instruction
+	instruction_word &=0xc0000000;
 	instruction_word >>= 30;
 	switch (instruction_word){
 	case 0:
