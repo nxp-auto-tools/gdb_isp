@@ -26,35 +26,6 @@
 #define OPERAND_i0_shftd_right	0x00380000U //[19:21] bits
 #define OPERAND_d0				0x01800000U //[22:23] bits
 
-enum scalar_operands_mask_types{
-	 first_scalar_operands_mask_type = OPERAND_FIRST|OPERAND_SECOND|OPERAND_C, //OPERAND_LARGE_IMM, OPERAND_I1|OPERAND_I2 also
-	second_scalar_operands_mask_type = OPERAND_FIRST|OPERAND_SECOND|OPERAND_THIRD,
-	 third_scalar_operands_mask_type = SHIFT_LEFT(OPERAND_SECOND,1)|OPERAND_IMM,
-	fourth_scalar_operands_mask_type = OPERAND_FIRST|OPERAND_SECOND|OPERAND_THIRD|OPERAND_FOURTH,
-	 fifth_scalar_operands_mask_type = OPERAND_FIRST|OPERAND_IMM,
-	 sixth_scalar_operands_mask_type = OPERAND_FIRST|OPERAND_SECOND,
-   seventh_scalar_operands_mask_type = OPERAND_SECOND|OPERAND_THIRD,
-    eighth_scalar_operands_mask_type = OPERAND_SECOND|OPERAND_THIRD_EXT_1,
-	// ninth_scalar_operands_mask_type = OPERAND_LARGE_IMM,
-	 tenth_scalar_operands_mask_type = OPERAND_FIRST,
-  eleventh_scalar_operands_mask_type = OPERAND_SECOND,
-  // twelfth_scalar_operands_mask_type = OPERAND_I1|OPERAND_I2,
-thirteenth_scalar_operands_mask_type = OPERAND_IMM,
-					no_operands = NONE_OPERAND
-}scalar_operands_mask_types;
-
-/*enum vector_operands_mask_types{
-
-}vector_operands_mask_types;
-
-enum combined_operands_mask_types{
-
-}combined_operands_mask_types;
-
-enum scalar_64_operands_mask_types{
-
-}scalar_64_operands_mask_types;*/
-
 typedef enum operand_type{
 	gap,
 	reg_t,
@@ -68,10 +39,10 @@ typedef struct apex_opc_info_t
   unsigned long opcode;
   unsigned int num_of_operands;
   operand_type op_type[5];
-  unsigned long op_pos; //operands positions
+  unsigned long op_pos[5]; //operands positions
+  unsigned int positions_to_shift[5];
   unsigned long non_read_pos; //positions of instr, that not reads by.
 
 } apex_opc_info_t;
-
 
 #endif // OPCODE_APEX_H

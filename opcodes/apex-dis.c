@@ -37,148 +37,25 @@ int get_instruction_type (bfd_vma instruction_word){ //read first two bit in ins
 	}
 }
 const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data){ // brute force yet
-	for(;table->name;table++)
-		if ((data & ~table->op_pos & ~table->non_read_pos) == table->opcode)
+	bfd_vma op_pos;
+	unsigned int ind;
+	for(;table->name;table++){
+		for (ind=0;ind<table->num_of_operands;ind++)
+			op_pos|=table->op_pos[ind];
+		op_pos|=table->non_read_pos;
+		if ((data & ~op_pos) == table->opcode)
 			return table;
+	}
 	return NULL;
 }
 
 int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma data){
 
 	int index;
-	bfd_vma op_mask[5];
-	unsigned char positions_to_shift[5];
-
-	memset (op_mask, 0, 5*sizeof(bfd_vma));
-	memset (positions_to_shift, 0, 5);
-
-	switch(operation->op_pos){ // compare operands mask
-	case first_scalar_operands_mask_type:
-		switch(operation->num_of_operands){
-		case 1:	/*OPERAND_LARGE_IMM*/
-			op_mask[0]=OPERAND_LARGE_IMM;
-			positions_to_shift[0]=0;
-			break;
-		case 2:	/*OPERAND_I1|OPERAND_I2*/
-			op_mask[0]=OPERAND_I1;
-			op_mask[1]=OPERAND_I2;
-			positions_to_shift[0]=13;
-			positions_to_shift[1]=0;
-			break;
-		case 3:/*OPERAND_FIRST|OPERAND_SECOND|OPERAND_C*/
-			op_mask[0]=OPERAND_FIRST;
-			op_mask[1]=OPERAND_SECOND;
-			op_mask[2]=OPERAND_C;
-			positions_to_shift[0]=20;
-			positions_to_shift[1]=15;
-			positions_to_shift[2]=0;
-			break;
-		}
-		break;
-	case second_scalar_operands_mask_type:
-		/*OPERAND_FIRST|OPERAND_SECOND|OPERAND_THIRD*/
-
-		op_mask[0]=OPERAND_FIRST;
-		op_mask[1]=OPERAND_SECOND;
-		op_mask[2]=OPERAND_THIRD;
-		positions_to_shift[0]=20;
-		positions_to_shift[1]=15;
-		positions_to_shift[2]=10;
-		break;
-
-	case third_scalar_operands_mask_type:
-		/*SHIFT_LEFT(OPERAND_SECOND,1)|OPERAND_IMM*/
-
-		op_mask[0]=SHIFT_LEFT(OPERAND_SECOND,1);
-		op_mask[1]=OPERAND_IMM;
-		positions_to_shift[0]=16;
-		positions_to_shift[1]=0;
-		break;
-
-	case fourth_scalar_operands_mask_type:
-		/*OPERAND_FIRST|OPERAND_SECOND|OPERAND_THIRD|OPERAND_FOURTH*/
-
-		op_mask[0]=OPERAND_FIRST;
-		op_mask[1]=OPERAND_SECOND;
-		op_mask[2]=OPERAND_THIRD;
-		op_mask[3]=OPERAND_FOURTH;
-		positions_to_shift[0]=20;
-		positions_to_shift[1]=15;
-		positions_to_shift[2]=10;
-		positions_to_shift[3]=5;
-		break;
-
-	case fifth_scalar_operands_mask_type:
-		/*OPERAND_FIRST|OPERAND_IMM*/
-
-		op_mask[0]=OPERAND_FIRST;
-		op_mask[1]=OPERAND_IMM;
-		positions_to_shift[0]=20;
-		positions_to_shift[1]=0;
-		break;
-
-	case sixth_scalar_operands_mask_type:
-		/*OPERAND_FIRST|OPERAND_SECOND*/
-
-		op_mask[0]=OPERAND_FIRST;
-		op_mask[1]=OPERAND_SECOND;
-		positions_to_shift[0]=20;
-		positions_to_shift[1]=15;
-		break;
-
-	case seventh_scalar_operands_mask_type:
-		/*OPERAND_SECOND|OPERAND_THIRD*/
-
-		op_mask[0]=OPERAND_SECOND;
-		op_mask[1]=OPERAND_THIRD;
-		positions_to_shift[0]=15;
-		positions_to_shift[1]=10;
-		break;
-
-	case eighth_scalar_operands_mask_type:
-		/*OPERAND_SECOND|OPERAND_THIRD_EXT_1*/
-
-		op_mask[0]=OPERAND_SECOND;
-		op_mask[1]=OPERAND_THIRD_EXT_1;
-		positions_to_shift[0]=15;
-		positions_to_shift[1]=9;
-		break;
-
-	//case ninth_scalar_operands_mask_type:
-
-	case tenth_scalar_operands_mask_type:
-		/*OPERAND_FIRST*/
-
-		op_mask[0]=OPERAND_FIRST;
-		positions_to_shift[0]=20;
-		break;
-
-	case eleventh_scalar_operands_mask_type:
-		/*OPERAND_SECOND*/
-
-		op_mask[0]=OPERAND_SECOND;
-		positions_to_shift[0]=15;
-		break;
-
-	//case twelfth_scalar_operands_mask_type:
-
-	case thirteenth_scalar_operands_mask_type:
-		/*OPERAND_IMM*/
-
-		op_mask[0]=OPERAND_IMM;
-		positions_to_shift[0]=0;
-		break;
-
-	default:
-		operands=NULL;
-		return -1;
-	}
-	if (operands==NULL){
-		return -1;
-	}
 	for (index=0; index<operation->num_of_operands;index++){
 		operands[index].type = operation->op_type[index];
-		operands[index].value = SHIFT_RIGHT((data & op_mask[index]), positions_to_shift[index]);
+		//operands[index].value = SHIFT_RIGHT((data & op_mask[index]), positions_to_shift[index]);
+		operands[index].value = SHIFT_RIGHT((data & operation->op_pos[index]), operation->positions_to_shift[index]);
 	}
 	return 0;
 }
@@ -210,17 +87,6 @@ int compose_mnemonic (const apex_opc_info_t* instruction,operand* operands, char
 int
 print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 
-	bfd_vma mask1 = 0x8000;
-	bfd_vma mask2 = 0x2000;
-	bfd_vma mask3 = 0x6000;
-	bfd_vma mask4 = 0x18000;
-
-	/*fprintf(stderr,"cur_insn_addr before: 0x%08x\n",cur_insn_addr);
-	bfd_vma insn_order_num = (cur_insn_addr & ~(mask1|mask2|mask3|mask4));
-	fprintf(stderr,"insn_order_num: 0x%08x\n",insn_order_num);
-	cur_insn_addr =	 (cur_insn_addr - insn_order_num) + insn_order_num*4;
-	fprintf(stderr,"cur_insn_addr after: 0x%08x\n",cur_insn_addr);
-*/
 	bfd_byte instr_low_bytes [word_instruction_length];
 	// bfd_byte instr_high_bytes [word_instruction_length];
 	const apex_opc_info_t* opcode_table;
