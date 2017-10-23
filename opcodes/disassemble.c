@@ -24,6 +24,7 @@
 #ifdef ARCH_all
 #define ARCH_aarch64
 #define ARCH_alpha
+#define ARCH_apex
 #define ARCH_arc
 #define ARCH_arm
 #define ARCH_avr
@@ -124,6 +125,11 @@ disassembler (bfd *abfd)
     case bfd_arch_alpha:
       disassemble = print_insn_alpha;
       break;
+#endif
+#ifdef ARCH_apex
+    case bfd_arch_apex:
+	  disassemble = print_insn_apex;
+	  break;
 #endif
 #ifdef ARCH_arc
     case bfd_arch_arc:
@@ -582,6 +588,12 @@ disassemble_init_for_target (struct disassemble_info * info)
       info->symbol_is_valid = aarch64_symbol_is_valid;
       info->disassembler_needs_relocs = TRUE;
       break;
+#endif
+#ifdef ARCH_apex
+    case bfd_arch_apex:
+    	info->endian = BFD_ENDIAN_LITTLE;
+    	info->endian_code = BFD_ENDIAN_LITTLE;
+    	info->display_endian = BFD_ENDIAN_LITTLE;
 #endif
 #ifdef ARCH_arm
     case bfd_arch_arm:

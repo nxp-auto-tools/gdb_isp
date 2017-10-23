@@ -5,18 +5,10 @@
 #ifndef OPCODE_APEX_H
 #define OPCODE_APEX_H
 
-typedef struct apex_opc_info_t
-{
-  const char *name;
-  unsigned char instr_t; // instruction type (Scalar(0x0), Vector(0x1), Combined(0x2))
-  unsigned long opcode;
-  unsigned long operands; //operands positions
-} apex_opc_info_t;
+#define SHIFT_LEFT(v, p) ((v)<<(p)) //v - value; p - number of positions to shift
+#define SHIFT_RIGHT(v, p) ((v)>>(p))
 
-/* Bit-masks for instruction members separation use "&&" */
-/*#define INST_TYPE			0xC0000000;
-#define INST_SHORT_OPCODE	0x3E000000;
-#define INST_LONG_OPCODE	0x3E0000FF;*/
+#define NONE_OPERAND 0x00000000U
 
 #define OPERAND_FIRST			0x01F00000U //[20:24] bits
 #define OPERAND_SECOND			0x000F8000U //[15:19] bits
@@ -29,10 +21,28 @@ typedef struct apex_opc_info_t
 #define OPERAND_I1				0x01FFE000U //[13:24] bits
 #define OPERAND_I2				0x00001FFFU	// [0:12] bits
 
-#define SHIFT_LEFT(v, p) ((v)<<(p)) //v - value; p - number of positions to shift
-#define SHIFT_RIGHT(v, p) ((v)>>(p))
+#define OPERAND_s0				0x00000C00U //[10:11] bits
+#define OPERAND_i0				0x01C00000U //[22:24] bits
+#define OPERAND_i0_shftd_right	0x00380000U //[19:21] bits
+#define OPERAND_d0				0x01800000U //[22:23] bits
 
+typedef enum operand_type{
+	gap,
+	reg_t,
+	imm_t,
 
+}operand_type;
 
+typedef struct apex_opc_info_t
+{
+  const char *name;
+  unsigned long opcode;
+  unsigned int num_of_operands;
+  operand_type op_type[5];
+  unsigned long op_pos[5]; //operands positions
+  unsigned int positions_to_shift[5];
+  unsigned long non_read_pos; //positions of instr, that not reads by.
+
+} apex_opc_info_t;
 
 #endif // OPCODE_APEX_H
