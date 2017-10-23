@@ -1,5 +1,5 @@
 /* Select disassembly routine for specified architecture.
-   Copyright (C) 1994-2015 Free Software Foundation, Inc.
+   Copyright (C) 1994-2016 Free Software Foundation, Inc.
 
    This file is part of the GNU opcodes library.
 
@@ -552,6 +552,9 @@ disassembler_usage (FILE *stream ATTRIBUTE_UNUSED)
 {
 #ifdef ARCH_aarch64
   print_aarch64_disassembler_options (stream);
+#endif
+#ifdef ARCH_arc
+  print_arc_disassembler_options (stream);
 #endif
 #ifdef ARCH_arm
   print_arm_disassembler_options (stream);
