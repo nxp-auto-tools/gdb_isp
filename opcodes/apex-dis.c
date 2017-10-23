@@ -54,7 +54,6 @@ int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma
 	int index;
 	for (index=0; index<operation->num_of_operands;index++){
 		operands[index].type = operation->op_type[index];
-		//operands[index].value = SHIFT_RIGHT((data & op_mask[index]), positions_to_shift[index]);
 		operands[index].value = SHIFT_RIGHT((data & operation->op_pos[index]), operation->positions_to_shift[index]);
 	}
 	return 0;
