@@ -17,6 +17,9 @@ typedef enum operand_type{
 	gap,
 	reg_t,
 	imm_t,
+	vcs_t,
+	f_t,
+	sel_t
 
 }operand_type;
 
@@ -25,9 +28,9 @@ typedef struct apex_opc_info_t
   const char *name;
   unsigned long opcode;
   unsigned int num_of_operands;
-  operand_type op_type[5];
-  unsigned long op_mask[5]; //operands positions
-  unsigned int positions_to_shift[5];
+  operand_type op_type[6];
+  unsigned long op_mask[6]; //operands positions
+  unsigned int op_offset[5];
   unsigned long non_read_pos; //positions of instr, that not reads by.
 
 } apex_opc_info_t;
