@@ -403,7 +403,7 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{     "vsltu", 0x400004E0U, 4, {reg_t,reg_t,reg_t,reg_t,gap},	{0x3,0x7,0x1F,0x7,0},	{22,19,14,11,0},0x1003800},
 	{ NULL, 0, 0, 0}
 };
-#endif
+
 /*Scalar-Vector combined instructions*/
 //TODO:
 

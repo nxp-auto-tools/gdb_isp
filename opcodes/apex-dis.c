@@ -14,11 +14,14 @@ typedef struct operand{
 	operand_type type;
 }operand;
 extern const apex_opc_info_t apex_APC_32b_scalar_opc_info[135];
+extern const apex_opc_info_t apex_APC_32b_vector_opc_info[135];
 
 int get_instruction_type (bfd_vma instruction_word);
 const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data);
 int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma data);
-int compose_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string);
+int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string);
+int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string);
+int (*compose_mnemonic) (const apex_opc_info_t* instruction,operand* operands,char* string);
 
 int get_instruction_type (bfd_vma instruction_word){ //read first two bit in instruction
 	instruction_word &=0xc0000000;
@@ -41,7 +44,7 @@ const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma dat
 	unsigned int ind;
 	for(;table->name;table++){
 		for (ind=0;ind<table->num_of_operands;ind++)
-			op_pos|=table->op_pos[ind];
+			op_pos|=SHIFT_LEFT(table->op_mask[ind],table->op_offset[ind]);
 		op_pos|=table->non_read_pos;
 		if ((data & ~op_pos) == table->opcode)
 			return table;
@@ -59,7 +62,7 @@ int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma
 	return 0;
 }
 
-int compose_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
+int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
 	int index;
 	const char* value_string [8];
 	memset (value_string,0,8);
@@ -83,6 +86,75 @@ int compose_mnemonic (const apex_opc_info_t* instruction,operand* operands, char
 	return strlen(string);
 }
 
+int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
+	int index;
+	bfd_vma imm;
+	const char* value_string [16];
+	memset (value_string,0,16);
+	strcat(string, instruction->name);
+	for (index=0;index<instruction->num_of_operands;index++){
+		switch(operands[index].type){
+		case gap:
+			strcat(string," _g_");
+			break;
+		case reg_t:
+			strcat(string," r");
+			sprintf(value_string,"%d",operands[index].value);
+			break;
+		case imm_t:
+			imm = operands[index].value;
+			if(index<instruction->num_of_operands-1)
+				if(operands[index+1].type==imm_t)
+					imm=(SHIFT_LEFT(operands[index].value,instruction->op_offset[index])|operands[index+1].value);
+			strcat(string," #");
+			sprintf(value_string,"0x%08x",imm);
+			break;
+		case vcs_t:
+			strcat(string," vcs");
+			switch(operands[index].value){
+			case 0:
+				sprintf(value_string,"push_l 0");
+				break;
+			case 1:
+				sprintf(value_string,"push_l 2");
+				break;
+			case 2:
+				sprintf(value_string,"nop");
+				break;
+			case 3:
+				sprintf(value_string,"fpop");
+				break;
+			case 4:
+				sprintf(value_string,"push_l 1");
+				break;
+			case 5:
+				sprintf(value_string,"push_l 3");
+				break;
+			case 6:
+				sprintf(value_string,"flip");
+				break;
+			case 7:
+				sprintf(value_string,"pop");
+				break;
+			}
+			break;
+		case f_t:
+			strcat(string," flag=");
+			if (operands[index].value > 0)
+				sprintf(value_string,"true");
+			else
+				sprintf(value_string,"false");
+			break;
+		case sel_t:
+			strcat(string," sel");
+			sprintf(value_string,"%d",operands[index].value);
+			break;
+		}
+	strcat(string,value_string);
+	}
+	return strlen(string);
+}
+
 int
 print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 
@@ -90,7 +162,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	// bfd_byte instr_high_bytes [word_instruction_length];
 	const apex_opc_info_t* opcode_table;
 	const apex_opc_info_t* current_instruction;
-	operand operands[5];
+	operand operands[6];
 	char instr_string_shape[64];
 
 	memset(instr_string_shape,0,64);
@@ -119,10 +191,13 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     switch (get_instruction_type(data)){
 
     case scalar_instruction_type:
+    	compose_mnemonic = compose_scalar_mnemonic;
     	opcode_table = apex_APC_32b_scalar_opc_info;
     	break;
     case vector_instruction_type:
-   // 	break;
+    	compose_mnemonic = compose_vector_mnemonic;
+    	opcode_table = apex_APC_32b_vector_opc_info;
+    	break;
     case combined_instruction_type:
   //  	break;
     case scalar64_instruction_type:

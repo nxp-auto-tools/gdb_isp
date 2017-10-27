@@ -30,7 +30,7 @@ typedef struct apex_opc_info_t
   unsigned int num_of_operands;
   operand_type op_type[6];
   unsigned long op_mask[6]; //operands positions
-  unsigned int op_offset[5];
+  unsigned int op_offset[6];
   unsigned long non_read_pos; //positions of instr, that not reads by.
 
 } apex_opc_info_t;
