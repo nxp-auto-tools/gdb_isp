@@ -34,6 +34,6 @@
   <reg name="r29" bitsize="32" type="uint32"/>
   <reg name="r30" bitsize="32" type="uint32"/>
   <reg name="r31" bitsize="32" type="uint32"/>
-  <reg name="ov" bitsize="32" type="uint32"/>
-  <reg name="pc" bitsize="32" type="uint32"/>
+  <reg name="ov"  bitsize="32" type="uint32"/>
+  <reg name="pc"  bitsize="32" type="uint32"/>
 </feature>
