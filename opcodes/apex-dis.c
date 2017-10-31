@@ -44,7 +44,7 @@ const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma dat
 	unsigned int ind;
 	for(;table->name;table++){
 		for (ind=0,op_pos=0;ind<table->num_of_operands;ind++)
-			op_pos|=SHIFT_RIGHT(table->op_mask[ind],table->op_offset[ind]);
+			op_pos|=SHIFT_LEFT(table->op_mask[ind],table->op_offset[ind]);
 		op_pos|=table->non_read_pos;
 		if ((data & ~op_pos) == table->opcode)
 			return table;
