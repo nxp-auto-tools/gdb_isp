@@ -13,6 +13,17 @@ typedef struct operand{
 	bfd_vma value;
 	operand_type type;
 }operand;
+
+const char* vcs_str[] = {
+		"push_l 0",
+		"push_l 2",
+		"nop",
+		"fpop",
+		"push_l 1",
+		"push_l 3",
+		"flip",
+		"pop"
+};
 extern const apex_opc_info_t apex_APC_32b_scalar_opc_info[135];
 extern const apex_opc_info_t apex_APC_32b_vector_opc_info[135];
 
@@ -111,32 +122,7 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			break;
 		case vcs_t:
 			strcat(string," vcs");
-			switch(operands[index].value){
-			case 0:
-				sprintf(value_string,"push_l 0");
-				break;
-			case 1:
-				sprintf(value_string,"push_l 2");
-				break;
-			case 2:
-				sprintf(value_string,"nop");
-				break;
-			case 3:
-				sprintf(value_string,"fpop");
-				break;
-			case 4:
-				sprintf(value_string,"push_l 1");
-				break;
-			case 5:
-				sprintf(value_string,"push_l 3");
-				break;
-			case 6:
-				sprintf(value_string,"flip");
-				break;
-			case 7:
-				sprintf(value_string,"pop");
-				break;
-			}
+			sprintf(value_string, vcs_str[operands[index].value]);
 			break;
 		case f_t:
 			strcat(string," flag=");
