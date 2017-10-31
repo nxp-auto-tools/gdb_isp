@@ -426,7 +426,7 @@ apex_gdbarch_init (struct gdbarch_info info,
     }  
 
     
-  feature = tdesc_find_feature (tdesc, "org.gnu.gdb.apex.apu.vu");    
+  feature = tdesc_find_feature (tdesc, "org.gnu.gdb.apex.apu.acp.vec");
     
   if (feature != NULL)
     {

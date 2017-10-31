@@ -12,7 +12,7 @@ initialize_tdesc_apex_apu (void)
   struct target_desc *result = allocate_target_description ();
   struct tdesc_feature *feature;
   struct tdesc_type *field_type;
-  struct tdesc_type *type;
+ // struct tdesc_type *type;
 
   set_tdesc_architecture (result, bfd_scan_arch ("apex"));
 
@@ -51,6 +51,33 @@ initialize_tdesc_apex_apu (void)
   tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "uint32");
   tdesc_create_reg (feature, "ov", 32, 1, NULL, 32, "uint32");
   tdesc_create_reg (feature, "pc", 33, 1, NULL, 32, "uint32");
+
+  feature = tdesc_create_feature (result, "org.gnu.gdb.apex.apu.acp.vec");
+  field_type = tdesc_named_type (feature, "uint16");
+  tdesc_create_vector (feature, "v0", field_type, 32);
+  tdesc_create_vector (feature, "v1", field_type, 32);
+  tdesc_create_vector (feature, "v2", field_type, 32);
+  tdesc_create_vector (feature, "v3", field_type, 32);
+  tdesc_create_vector (feature, "v4", field_type, 32);
+  tdesc_create_vector (feature, "v5", field_type, 32);
+  tdesc_create_vector (feature, "v6", field_type, 32);
+  tdesc_create_vector (feature, "v7", field_type, 32);
+
+  tdesc_create_reg (feature, "ovv", 34, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vc0", 35, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vc1", 36, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vc2", 37, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vc3", 38, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcsptr",39, 1,"vcu", 8, "uint8");
+  tdesc_create_reg (feature, "vcs0", 40, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcs1", 41, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcs2", 42, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcs3", 43, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcs4", 44, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcs5", 45, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcs6", 46, 1, "vcu", 32, "uint32");
+  tdesc_create_reg (feature, "vcs7", 47, 1, "vcu", 32, "uint32");
+
 
   tdesc_apex = result;
 }
