@@ -38,30 +38,6 @@
 
 #include "dis-asm.h"
 #include "common/errors.h"
-//#include "opcodes/apex-desc.h"
-//#include "opcodes/apex-opc.h"
-
-
-/* The gdbarch_tdep structure.  */
-
-/*! APEX specific per-architecture information.*/
-enum apex_base_addr{
-	apex_0 = 0x74000000,
-	apex_1 = 0x78000000
-}apex_base_addr;
-//enum
-struct gdbarch_tdep
-{
-  unsigned int  num_matchpoints;	/* Total h/w breakpoints available. */
-  unsigned int  scalar_gp_regs_num;		/* Number of general registers.  */
-  unsigned int	num_cu_regs;		/* TODO: Number of computational units. Does it needed */
-  int           bytes_per_scalar_word; /* self-commented */
-  int			bytes_per_vector_word; /* self-commented */
-  int           bytes_per_dmem_address; /* ACP memory */
-  int			bytes_per_cmem_address;	/* VU memory */
-  //CGEN_CPU_DESC gdb_cgen_cpu_desc;
-  //TODO: correct struct with appropriate params (must we separate vector/scalar word/addr size?)
-};
 
 static enum return_value_convention
 apex_return_value (struct gdbarch  *gdbarch,
@@ -71,10 +47,7 @@ apex_return_value (struct gdbarch  *gdbarch,
 		   gdb_byte        *readbuf,
 		   const gdb_byte  *writebuf)
 {
-
-  //TODO: todo
-
-
+	//TODO:
   return RETURN_VALUE_ABI_RETURNS_ADDRESS;
 }
 
@@ -96,30 +69,76 @@ static const char *const vcu_ctl_regs[] = {
 	"vcs6","vcs7"
 };
 
+static struct type *
+apex_builtin_type_vec_512 (struct gdbarch *gdbarch)
+{
+  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+
+  if (!tdep->apex_vector_512_type){
+
+	  const struct builtin_type *bt = builtin_type (gdbarch);
+      struct type *t;
+      t = arch_composite_type (gdbarch, "__gdb_builtin_type_vec_512", TYPE_CODE_UNION);
+      append_composite_type_field (t, "vec_512", init_vector_type (bt->builtin_uint16, 32));
+      TYPE_VECTOR (t) = 1;
+      TYPE_NAME (t) = "apex_builtin_type_vec_512";
+      tdep->apex_vector_512_type = t;
+    }
+
+  return tdep->apex_vector_512_type;
+}
+
+static struct type *
+apex_pseudo_register_type (struct gdbarch *gdbarch, int regnum){
+	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+	const struct builtin_type *bt = builtin_type (gdbarch);
+
+	if (regnum>=0 && regnum<APEX_ACP_REGS_END)
+		return bt->builtin_uint32;
+	if (regnum>=APEX_ACP_REGS_END && regnum<VECTORS_END)
+	 	return apex_builtin_type_vec_512 (gdbarch);
+	if (regnum>=VECTORS_END && regnum<vcsptr_REGNUM)
+		return bt->builtin_uint32;
+    if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
+		return bt->builtin_uint32;
+ 	if (regnum == vcsptr_REGNUM)
+		return bt->builtin_uint8;
+ 	//default
+ 	return bt->builtin_uint32;
+}
 
 static const char *
 apex_register_name (struct gdbarch *gdbarch,
 		    		int regnum){
 
-  if (regnum >= ARRAY_SIZE (acp_register_names))
-    /* These registers are only supported on targets which supply
-       an XML description.  */
-    return "";
-
-  return acp_register_names[regnum];
-  
+	if (regnum>=0 && regnum<APEX_ACP_REGS_END)
+		return acp_register_names[regnum];
+	if (regnum>=APEX_ACP_REGS_END && regnum<VECTORS_END)
+		return vcu_gp_regs[regnum-APEX_ACP_REGS_END];
+    if (regnum>=VECTORS_END && regnum<APEX_REGS_TOTAL_NUM)
+		return vcu_ctl_regs[regnum-VECTORS_END];
+  return "no_name";
 }
 
 static struct type *
-apex_register_type (struct gdbarch *arch,
-		    int             regnum)
-{
-  //TODO:
-  return builtin_type (arch)->builtin_uint32;
+apex_register_type (struct gdbarch *gdbarch, int regnum){
+
+	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+	const struct builtin_type *bt = builtin_type (gdbarch);
+
+	if (regnum>=0 && regnum<APEX_ACP_REGS_END)
+		return bt->builtin_uint32;
+	if (regnum>=APEX_ACP_REGS_END && regnum<VECTORS_END)
+	 	return apex_builtin_type_vec_512 (gdbarch);
+	if (regnum>=VECTORS_END && regnum<vcsptr_REGNUM)
+		return bt->builtin_uint32;
+    if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
+		return bt->builtin_uint32;
+ 	if (regnum == vcsptr_REGNUM)
+		return bt->builtin_uint8;
+ 	//default
+ 	return bt->builtin_uint32;
 }
-
-
-
 
 static void
 apex_registers_info (struct gdbarch    *gdbarch,
@@ -177,7 +196,7 @@ struct apex_unwind_cache
 
   /* The offset of register saved on stack.  If register is not saved, the
      corresponding element is -1.  */
-  CORE_ADDR reg_saved[APEX_ACP_REGS];
+  CORE_ADDR reg_saved[APEX_ACP_REGS_END];
 };
 
 static void
@@ -185,7 +204,7 @@ apex_setup_default (struct apex_unwind_cache *cache)
 {
   int i;
 
-  for (i = 0; i < APEX_ACP_REGS; i++)
+  for (i = 0; i < APEX_ACP_REGS_END; i++)
     cache->reg_saved[i] = -1;
 }
 
@@ -314,7 +333,7 @@ apex_frame_prev_register (struct frame_info *this_frame,
 
   /* If we've worked out where a register is stored then load it from
      there.  */
-  if (regnum < APEX_ACP_REGS && cache->reg_saved[regnum] != -1)
+  if (regnum < APEX_ACP_REGS_END && cache->reg_saved[regnum] != -1)
     return frame_unwind_got_memory (this_frame, regnum,
 				    cache->reg_saved[regnum]);
 
@@ -366,7 +385,7 @@ apex_gdbarch_init (struct gdbarch_info info,
 
   struct tdesc_arch_data *tdesc_data = NULL;
   const struct target_desc *tdesc=info.target_desc;
-  const struct tdesc_feature *feature;
+  const struct tdesc_feature *feature,*feature_vcu;
 
   int i;
   int valid_p = 1;
@@ -415,30 +434,37 @@ apex_gdbarch_init (struct gdbarch_info info,
   i++;
 
 
-  if (!valid_p)
-    {
+  if (!valid_p) {
       tdesc_data_cleanup (tdesc_data);
       return NULL;
-    }
-  else
-    {
-      regs_num += i;
-    }  
+  }
 
     
-  feature = tdesc_find_feature (tdesc, "org.gnu.gdb.apex.apu.acp.vec");
+  feature_vcu = tdesc_find_feature (tdesc, "org.gnu.gdb.apex.apu.vec");
     
-  if (feature != NULL)
-    {
-      //TODO: check VU registers
-      
-      
-      if (!valid_p)
-      {
-        tdesc_data_cleanup (tdesc_data);
-        return NULL;
-      }
-    }
+  if (feature_vcu == NULL){
+    error ("apex_gdbarch_init: no feature org.gnu.gdb.apex.apu.vec");
+    return NULL;
+  }
+
+ // valid_p = 1;
+  for (i; i < VECTORS_END; i++){
+    valid_p &= tdesc_numbered_register (feature_vcu, tdesc_data, i,
+                                        vcu_gp_regs[i-APEX_ACP_REGS_END]);
+  }
+  for (i;i<APEX_REGS_TOTAL_NUM;i++){
+	    valid_p &= tdesc_numbered_register (feature_vcu, tdesc_data, i,
+	                                        vcu_ctl_regs[i-VECTORS_END]);
+
+  }
+ // fprintf(stderr,"v0 size = %d\n",tdesc_register_size(feature,"v0"));
+  if (!valid_p){
+     tdesc_data_cleanup (tdesc_data);
+     return NULL;
+  } else {
+      regs_num += i;
+  }
+
 
 
   tdep = XCNEW (struct gdbarch_tdep);
@@ -462,6 +488,7 @@ apex_gdbarch_init (struct gdbarch_info info,
   set_gdbarch_breakpoint_from_pc    (gdbarch, apex_breakpoint_from_pc);
   set_gdbarch_bits_big_endian 		(gdbarch, BFD_ENDIAN_LITTLE);
 
+  set_tdesc_pseudo_register_type (gdbarch, apex_pseudo_register_type);
 
     /* Internal <-> external register number maps.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, apex_dwarf_reg_to_regnum);

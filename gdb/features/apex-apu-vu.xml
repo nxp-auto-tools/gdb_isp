@@ -1,29 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<feature name="org.gnu.gdb.apex.apu.acp.vec">
-    <vector id="v0" type="uint16" count="32"/>
-    <vector id="v1" type="uint16" count="32"/>
-    <vector id="v2" type="uint16" count="32"/>
-    <vector id="v3" type="uint16" count="32"/>
-    <vector id="v4" type="uint16" count="32"/>
-    <vector id="v5" type="uint16" count="32"/>
-    <vector id="v6" type="uint16" count="32"/>
-    <vector id="v7" type="uint16" count="32"/>
-    
-    <reg name="ovv" bitsize="32"/>
-    <reg name="vc0" bitsize="32"/>
-    <reg name="vc1" bitsize="32"/>
-    <reg name="vc2" bitsize="32"/>
-    <reg name="vc3" bitsize="32"/>
-    <reg name="vcsptr" bitsize="8"/>
-    <reg name="vcs0" bitsize="32"/>
-    <reg name="vcs1" bitsize="32"/>
-    <reg name="vcs2" bitsize="32"/>
-    <reg name="vcs3" bitsize="32"/>
-    <reg name="vcs4" bitsize="32"/>
-    <reg name="vcs5" bitsize="32"/>
-    <reg name="vcs6" bitsize="32"/>
-    <reg name="vcs7" bitsize="32"/>
+<feature name="org.gnu.gdb.apex.apu.vec">
+    <vector id="vector" type="uint16" count="32"/
+	<union id="vector_type">
+	    <field name="v32x16" type="vector"/>
+	</union>
+	
+    <reg name="v0" bitsize="512" type="vector_type"/>
+    <reg name="v1" bitsize="512" type="vector_type"/>
+    <reg name="v2" bitsize="512" type="vector_type"/>
+    <reg name="v3" bitsize="512" type="vector_type"/>
+    <reg name="v4" bitsize="512" type="vector_type"/>
+    <reg name="v5" bitsize="512" type="vector_type"/>
+    <reg name="v6" bitsize="512" type="vector_type"/>
+    <reg name="v7" bitsize="512" type="vector_type"/>
+
+    <reg name="ovv" bitsize="32" type="uint32"/>
+    <reg name="vc0" bitsize="32" type="uint32"/>
+    <reg name="vc1" bitsize="32" type="uint32"/>
+    <reg name="vc2" bitsize="32" type="uint32"/>
+    <reg name="vc3" bitsize="32" type="uint32"/>
+    <reg name="vcsptr" bitsize="8" type="uint8"/>
+    <reg name="vcs0" bitsize="32" type="uint32"/>
+    <reg name="vcs1" bitsize="32" type="uint32"/>
+    <reg name="vcs2" bitsize="32" type="uint32"/>
+    <reg name="vcs3" bitsize="32" type="uint32"/>
+    <reg name="vcs4" bitsize="32" type="uint32"/>
+    <reg name="vcs5" bitsize="32" type="uint32"/>
+    <reg name="vcs6" bitsize="32" type="uint32"/>
+    <reg name="vcs7" bitsize="32" type="uint32"/>
 </feature>
     
