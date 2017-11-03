@@ -59,7 +59,7 @@ initialize_tdesc_apex_apu (void)
   tdesc_create_vector (feature, "vector", vector_cell_type, 32);
   type = tdesc_create_union (feature, "vector_type");
   union_field_type = tdesc_named_type (feature, "vector");
-  tdesc_add_field (type, "v32x16", union_field_type);
+  tdesc_add_field (type, "v32_uint16", union_field_type);
 
  /* tdesc_create_vector (feature, "v1", vector_cell_type, 32);
   type = tdesc_create_union (feature, "v1");
