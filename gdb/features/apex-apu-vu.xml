@@ -2,7 +2,7 @@
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
 <feature name="org.gnu.gdb.apex.apu.vec">
-    <vector id="vector" type="uint16" count="32"/
+    <vector id="vector" type="uint16" count="32"/>
 	<union id="vector_type">
 	    <field name="v32x16" type="vector"/>
 	</union>

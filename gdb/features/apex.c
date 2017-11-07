@@ -61,41 +61,6 @@ initialize_tdesc_apex_apu (void)
   union_field_type = tdesc_named_type (feature, "vector");
   tdesc_add_field (type, "v32_uint16", union_field_type);
 
- /* tdesc_create_vector (feature, "v1", vector_cell_type, 32);
-  type = tdesc_create_union (feature, "v1");
-  union_field_type = tdesc_named_type (feature, "v1");
-  tdesc_add_field (type, "v32x16", union_field_type);
-
-  tdesc_create_vector (feature, "v2", vector_cell_type, 32);
-  type = tdesc_create_union (feature, "v2");
-  union_field_type = tdesc_named_type (feature, "v2");
-  tdesc_add_field (type, "v32x16", union_field_type);
-
-  tdesc_create_vector (feature, "v3", vector_cell_type, 32);
-  type = tdesc_create_union (feature, "v3");
-  union_field_type = tdesc_named_type (feature, "v3");
-  tdesc_add_field (type, "v32x16", union_field_type);
-
-  tdesc_create_vector (feature, "v4", vector_cell_type, 32);
-  type = tdesc_create_union (feature, "v4");
-  union_field_type = tdesc_named_type (feature, "v4");
-  tdesc_add_field (type, "v32x16", union_field_type);
-
-  tdesc_create_vector (feature, "v5", vector_cell_type, 32);
-  type = tdesc_create_union (feature, "v5");
-  union_field_type = tdesc_named_type (feature, "v5");
-  tdesc_add_field (type, "v32x16", union_field_type);
-
-  tdesc_create_vector (feature, "v6", vector_cell_type, 32);
-  type = tdesc_create_union (feature, "v6");
-  union_field_type = tdesc_named_type (feature, "v6");
-  tdesc_add_field (type, "v32x16", union_field_type);
-
-  tdesc_create_vector (feature, "v7", vector_cell_type, 32);
-  type = tdesc_create_union (feature, "vcsptr_REGNUMv7");
-  union_field_type = tdesc_named_type (feature, "v7");
-  tdesc_add_field (type, "v32x16", union_field_type);*/
-
   tdesc_create_reg (feature, "v0",   34, 1, "vcu", 512, "vector_type");
   tdesc_create_reg (feature, "v1",   35, 1, "vcu", 512, "vector_type");
   tdesc_create_reg (feature, "v2",   36, 1, "vcu", 512, "vector_type");
