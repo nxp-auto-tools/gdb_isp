@@ -7,28 +7,28 @@
 	    <field name="v32_uint16" type="vector"/>
 	</union>
 	
-    <reg name="v0" bitsize="512" type="vector_type"/>
-    <reg name="v1" bitsize="512" type="vector_type"/>
-    <reg name="v2" bitsize="512" type="vector_type"/>
-    <reg name="v3" bitsize="512" type="vector_type"/>
-    <reg name="v4" bitsize="512" type="vector_type"/>
-    <reg name="v5" bitsize="512" type="vector_type"/>
-    <reg name="v6" bitsize="512" type="vector_type"/>
-    <reg name="v7" bitsize="512" type="vector_type"/>
+    <reg name="v0" group="vcu" bitsize="512" type="vector_type"/>
+    <reg name="v1" group="vcu" bitsize="512" type="vector_type"/>
+    <reg name="v2" group="vcu" bitsize="512" type="vector_type"/>
+    <reg name="v3" group="vcu" bitsize="512" type="vector_type"/>
+    <reg name="v4" group="vcu" bitsize="512" type="vector_type"/>
+    <reg name="v5" group="vcu" bitsize="512" type="vector_type"/>
+    <reg name="v6" group="vcu" bitsize="512" type="vector_type"/>
+    <reg name="v7" group="vcu" bitsize="512" type="vector_type"/>
 
-    <reg name="ovv" bitsize="32" type="uint32"/>
-    <reg name="vc0" bitsize="32" type="uint32"/>
-    <reg name="vc1" bitsize="32" type="uint32"/>
-    <reg name="vc2" bitsize="32" type="uint32"/>
-    <reg name="vc3" bitsize="32" type="uint32"/>
-    <reg name="vcsptr" bitsize="8" type="uint8"/>
-    <reg name="vcs0" bitsize="32" type="uint32"/>
-    <reg name="vcs1" bitsize="32" type="uint32"/>
-    <reg name="vcs2" bitsize="32" type="uint32"/>
-    <reg name="vcs3" bitsize="32" type="uint32"/>
-    <reg name="vcs4" bitsize="32" type="uint32"/>
-    <reg name="vcs5" bitsize="32" type="uint32"/>
-    <reg name="vcs6" bitsize="32" type="uint32"/>
-    <reg name="vcs7" bitsize="32" type="uint32"/>
+    <reg name="ovv" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vc0" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vc1" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vc2" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vc3" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcsptr" group="vcu" bitsize="8" type="uint8"/>
+    <reg name="vcs0" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcs1" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcs2" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcs3" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcs4" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcs5" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcs6" group="vcu" bitsize="32" type="uint32"/>
+    <reg name="vcs7" group="vcu" bitsize="32" type="uint32"/>
 </feature>
     
