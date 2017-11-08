@@ -136,8 +136,6 @@ apex_register_type (struct gdbarch *gdbarch, int regnum){
 		return bt->builtin_uint8;
     if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
 		return bt->builtin_uint32;
- 	if (regnum == vcsptr_REGNUM)
-		return bt->builtin_uint8;
  	//default
  	return bt->builtin_uint32;
 }
