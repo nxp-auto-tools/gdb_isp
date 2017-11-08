@@ -93,7 +93,7 @@ apex_pseudo_register_type (struct gdbarch *gdbarch, int regnum){
 	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
 	const struct builtin_type *bt = builtin_type (gdbarch);
 
-	if (regnum>=0 && regnum<APEX_ACP_REGS_END)
+	if (regnum>=APEX_R0_REGNUM && regnum<APEX_ACP_REGS_END)
 		return bt->builtin_uint32;
 	if (regnum>=APEX_ACP_REGS_END && regnum<VECTORS_END)
 	 	return apex_builtin_type_vec_512 (gdbarch);
@@ -111,7 +111,7 @@ static const char *
 apex_register_name (struct gdbarch *gdbarch,
 		    		int regnum){
 
-	if (regnum>=0 && regnum<APEX_ACP_REGS_END)
+	if (regnum>=APEX_R0_REGNUM && regnum<APEX_ACP_REGS_END)
 		return acp_register_names[regnum];
 	if (regnum>=APEX_ACP_REGS_END && regnum<VECTORS_END)
 		return vcu_gp_regs[regnum-APEX_ACP_REGS_END];
@@ -126,7 +126,7 @@ apex_register_type (struct gdbarch *gdbarch, int regnum){
 	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
 	const struct builtin_type *bt = builtin_type (gdbarch);
 
-	if (regnum>=0 && regnum<APEX_ACP_REGS_END)
+	if (regnum>=APEX_R0_REGNUM && regnum<APEX_ACP_REGS_END)
 		return bt->builtin_uint32;
 	if (regnum>=APEX_ACP_REGS_END && regnum<VECTORS_END)
 	 	return apex_builtin_type_vec_512 (gdbarch);
