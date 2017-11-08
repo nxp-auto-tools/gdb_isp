@@ -99,10 +99,10 @@ apex_pseudo_register_type (struct gdbarch *gdbarch, int regnum){
 	 	return apex_builtin_type_vec_512 (gdbarch);
 	if (regnum>=VECTORS_END && regnum<vcsptr_REGNUM)
 		return bt->builtin_uint32;
-    if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
-		return bt->builtin_uint32;
  	if (regnum == vcsptr_REGNUM)
 		return bt->builtin_uint8;
+    if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
+		return bt->builtin_uint32;
  	//default
  	return bt->builtin_uint32;
 }
@@ -132,6 +132,8 @@ apex_register_type (struct gdbarch *gdbarch, int regnum){
 	 	return apex_builtin_type_vec_512 (gdbarch);
 	if (regnum>=VECTORS_END && regnum<vcsptr_REGNUM)
 		return bt->builtin_uint32;
+ 	if (regnum == vcsptr_REGNUM)
+		return bt->builtin_uint8;
     if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
 		return bt->builtin_uint32;
  	if (regnum == vcsptr_REGNUM)
@@ -447,7 +449,6 @@ apex_gdbarch_init (struct gdbarch_info info,
     return NULL;
   }
 
- // valid_p = 1;
   for (i; i < VECTORS_END; i++){
     valid_p &= tdesc_numbered_register (feature_vcu, tdesc_data, i,
                                         vcu_gp_regs[i-APEX_ACP_REGS_END]);
@@ -457,7 +458,6 @@ apex_gdbarch_init (struct gdbarch_info info,
 	                                        vcu_ctl_regs[i-VECTORS_END]);
 
   }
- // fprintf(stderr,"v0 size = %d\n",tdesc_register_size(feature,"v0"));
   if (!valid_p){
      tdesc_data_cleanup (tdesc_data);
      return NULL;
@@ -465,12 +465,8 @@ apex_gdbarch_init (struct gdbarch_info info,
       regs_num += i;
   }
 
-
-
   tdep = XCNEW (struct gdbarch_tdep);
   gdbarch = gdbarch_alloc (&info, tdep);
-
-
 
   /* Target data types.  */
   set_gdbarch_short_bit             (gdbarch, 16);
@@ -513,11 +509,8 @@ apex_gdbarch_init (struct gdbarch_info info,
   /* instruction set printer */
   set_gdbarch_print_insn (gdbarch, apex_gdb_print_insn);
 
-
   return gdbarch;
 } /* apex_gdbarch_init() */
-
-
 
 /*----------------------------------------------------------------------------*/
 /*!Dump the target specific data for this architecture
@@ -531,10 +524,9 @@ apex_dump_tdep (struct gdbarch *gdbarch,
 {
   struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
 
-  if (NULL == tdep)
-    {
+  if (NULL == tdep){
       return;			/* Nothing to report */
-    }
+  }
 
   fprintf_unfiltered (file, "apex_dump_tdep: %d matchpoints available\n",
 		      tdep->num_matchpoints);
