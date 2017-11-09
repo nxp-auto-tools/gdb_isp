@@ -2,6 +2,6 @@
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
 <feature name="org.gnu.gdb.apex.apu.addreg">
-  <reg name="cmem_if_apu_pm_start"  bitsize="32" type="uint32"/>
-  <reg name="cmem_if_apu_dm_start"  bitsize="32" type="uint32"/>
+  <reg name="cmem_if_apu_pm_start" group="ctrl" bitsize="32" type="uint32"/>
+  <reg name="cmem_if_apu_dm_start" group="ctrl" bitsize="32" type="uint32"/>
 </feature>

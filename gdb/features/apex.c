@@ -85,5 +85,9 @@ initialize_tdesc_apex_apu (void)
   tdesc_create_reg (feature, "vcs6", 54, 1, "vcu", 32, "uint32");
   tdesc_create_reg (feature, "vcs7", 55, 1, "vcu", 32, "uint32");
 
+  feature = tdesc_create_feature (result, "org.gnu.gdb.apex.apu.addreg");
+  tdesc_create_reg (feature, "cmem_if_apu_pm_start", 56, 1, "ctrl", 32, "uint32");
+  tdesc_create_reg (feature, "cmem_if_apu_dm_start", 57, 1, "ctrl", 32, "uint32");
+
   tdesc_apex = result;
 }
