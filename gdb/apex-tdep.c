@@ -121,6 +121,11 @@ apex_register_name (struct gdbarch *gdbarch,
 		return vcu_gp_regs[regnum-APEX_ACP_REGS_END];
     if (regnum>=VECTORS_END && regnum<VCU_REGS_END)
 		return vcu_ctl_regs[regnum-VECTORS_END];
+    if (regnum == cmem_if_apu_pm_start_regnum)
+    	return ctrl_regs[0];
+    if (regnum == cmem_if_apu_dm_start_regnum)
+    	return ctrl_regs[1];
+
   return "no_name";
 }
 
@@ -167,22 +172,26 @@ apex_breakpoint_from_pc (struct gdbarch *gdbarch,
 }
 
 static CORE_ADDR
-apex_pc_to_imem_addr (CORE_ADDR pc, CORE_ADDR dm_start){
-	//CORE_ADDR imem_addr = pc*4 - dm_start;
+apex_pc_to_imem_addr (ULONGEST pc, ULONGEST dm_start){
 
-	CORE_ADDR imem_addr;
+	CORE_ADDR imem_addr = (CORE_ADDR)(pc & 0xFFFFFFFF) *4 \
+			- (CORE_ADDR)(dm_start & 0xFFFFFFFF);
+
+	//for P&E_multilink_universal
+	/*CORE_ADDR imem_addr;
 
 	union mem_mapped_dm_start{
 		unsigned long addr;
 		gdb_byte addr_bytes[4];
 	}mem_mapped_dm_start;
 
-	if(0 > target_read_memory(0x00180008U,mem_mapped_dm_start.addr_bytes,4)){
+	if(0 > target_read_memory(0x0018000cU,mem_mapped_dm_start.addr_bytes,4)){
 		fprintf(stderr,"_apex_pc_to_imem_addr_: \
 				can't read from target memory with target_read_memory\n");
 		return 0;
 	}
-	imem_addr = pc*4 - mem_mapped_dm_start.addr;
+	imem_addr = pc*4 - mem_mapped_dm_start.addr;*/
+
 	return imem_addr;
 }
 
@@ -192,28 +201,26 @@ apex_read_pc (struct regcache* regcache){
 	  ULONGEST pc, dm_start;
 	  regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
 	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start);
-
-	  return apex_pc_to_imem_addr (pc, dm_start);
+	  CORE_ADDR imem_addr = apex_pc_to_imem_addr (pc, dm_start);
+	  return imem_addr;
 }
 
 /* Implement the "unwind_pc" gdbarch method.  */
 static CORE_ADDR
-apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame)
-{
-	/*TODO: pc mapping: pc*word_length(4)+APEX_BASE_ADDR(0x74000000)*/
+apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame){
 
-  CORE_ADDR pc
-    = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
- // struct value pm_start_value
-  //	  = regcache_cooked_read_value (this_frame->);
-  return pc;
+	  ULONGEST pc, dm_start;
+	  pc = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
+	  dm_start = frame_unwind_register_unsigned (this_frame, cmem_if_apu_dm_start_regnum);
+	  CORE_ADDR imem_addr = apex_pc_to_imem_addr (pc, dm_start);
+	  return imem_addr;
 }
 
 /* Implement the "unwind_sp" gdbarch method.  */
 static CORE_ADDR
 apex_unwind_sp (struct gdbarch *gdbarch, struct frame_info *this_frame)
 {
-  return frame_unwind_register_unsigned (this_frame, APEX_SP_REGNUM);
+	return frame_unwind_register_unsigned (this_frame, APEX_SP_REGNUM);
 }
 /* apex cache structure.  */
 struct apex_unwind_cache
@@ -493,12 +500,18 @@ apex_gdbarch_init (struct gdbarch_info info,
      tdesc_data_cleanup (tdesc_data);
      return NULL;
   }
-  feature_ctrl = tdesc_find_feature(tdesc,"org.gnu.gdb.apex.apu.addreg");
-  valid_p &= tdesc_numbered_register (feature_ctrl, tdesc_data, i,
-		  	  	  	  	  	  	  	  ctrl_regs[(i++)-cmem_if_apu_pm_start_regnum]);
-  valid_p &= tdesc_numbered_register (feature_ctrl, tdesc_data, i,
-		  	  	  	  	  	  	  	  ctrl_regs[(i++)-cmem_if_apu_dm_start_regnum]);
+  feature_ctrl = tdesc_find_feature(tdesc,"org.gnu.gdb.apex.apu.acp.dbg");
 
+  if (feature_ctrl == NULL){
+    error ("apex_gdbarch_init: no feature org.gnu.gdb.apex.apu.acp.dbg");
+    return NULL;
+  }
+  valid_p &= tdesc_numbered_register (feature_ctrl, tdesc_data, i,
+	  	  	  	  	  	  	  	  	  ctrl_regs[i-VCU_REGS_END]);
+  i++;
+  valid_p &= tdesc_numbered_register (feature_ctrl, tdesc_data, i,
+		  	  	  	  	  	  	  	  ctrl_regs[i-VCU_REGS_END]);
+  i++;
   if (!valid_p){
      tdesc_data_cleanup (tdesc_data);
      return NULL;

@@ -63,7 +63,8 @@ enum {
   vcs7_REGNUM,
   VCU_REGS_END,
   cmem_if_apu_pm_start_regnum = VCU_REGS_END,
-  cmem_if_apu_dm_start_regnum
+  cmem_if_apu_dm_start_regnum,
+  APEX_REGS_TOTAL_NUM
 
 };
 

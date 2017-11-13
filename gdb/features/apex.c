@@ -75,7 +75,7 @@ initialize_tdesc_apex_apu (void)
   tdesc_create_reg (feature, "vc1",  44, 1, "vcu", 32, "uint32");
   tdesc_create_reg (feature, "vc2",  45, 1, "vcu", 32, "uint32");
   tdesc_create_reg (feature, "vc3",  46, 1, "vcu", 32, "uint32");
-  tdesc_create_reg (feature, "vcsptr", 47, 1,"vcu", 8, "uint8");
+  tdesc_create_reg (feature, "vcsptr",47,1, "vcu",  8, "uint8");
   tdesc_create_reg (feature, "vcs0", 48, 1, "vcu", 32, "uint32");
   tdesc_create_reg (feature, "vcs1", 49, 1, "vcu", 32, "uint32");
   tdesc_create_reg (feature, "vcs2", 50, 1, "vcu", 32, "uint32");
@@ -85,9 +85,9 @@ initialize_tdesc_apex_apu (void)
   tdesc_create_reg (feature, "vcs6", 54, 1, "vcu", 32, "uint32");
   tdesc_create_reg (feature, "vcs7", 55, 1, "vcu", 32, "uint32");
 
-  feature = tdesc_create_feature (result, "org.gnu.gdb.apex.apu.addreg");
-  tdesc_create_reg (feature, "cmem_if_apu_pm_start", 56, 1, "ctrl", 32, "uint32");
-  tdesc_create_reg (feature, "cmem_if_apu_dm_start", 57, 1, "ctrl", 32, "uint32");
+  feature = tdesc_create_feature (result, "org.gnu.gdb.apex.apu.acp.dbg");
+  tdesc_create_reg (feature, "cmem_if_apu_pm_start", 56, 1, NULL, 32, "uint32");
+  tdesc_create_reg (feature, "cmem_if_apu_dm_start", 57, 1, NULL, 32, "uint32");
 
   tdesc_apex = result;
 }
