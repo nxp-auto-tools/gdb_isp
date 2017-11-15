@@ -154,7 +154,6 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	const apex_opc_info_t* current_instruction;
 	operand operands[6];
 	char instr_string_shape[64];
-	//cur_insn_addr*=4;
 	memset(instr_string_shape,0,64);
 	memset(operands,0,5*sizeof(operands[0]));
 
