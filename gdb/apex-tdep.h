@@ -25,6 +25,7 @@ struct gdbarch_tdep
   int           bytes_per_dmem_address; /* ACP memory */
   int			bytes_per_cmem_address;	/* VU memory */
   struct type* apex_vector_512_type;
+  CORE_ADDR dm_start;
 };
 
 enum {
@@ -70,10 +71,11 @@ enum {
 
 
 /***** TRUE OFFSETS ******/
-
+/*
 #define APEX_ACP_REG_GP 	0
 #define APEX_ACP_REG_CTL 	32
 #define APEX_VCU_REG_GP		44
 #define APEX_VCU_REG_CTL	52
+*/
 
 #endif

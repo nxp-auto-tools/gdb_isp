@@ -73,6 +73,9 @@ static const char *const ctrl_regs [] = {
 		"cmem_if_apu_pm_start",
 		"cmem_if_apu_dm_start"
 };
+
+CORE_ADDR apex_apu_data_mem_start;
+
 static struct type *
 apex_builtin_type_vec_512 (struct gdbarch *gdbarch)
 {
@@ -171,14 +174,14 @@ apex_breakpoint_from_pc (struct gdbarch *gdbarch,
 
 }
 
-static CORE_ADDR
+/*static CORE_ADDR
 apex_pc_to_imem_addr (ULONGEST pc, ULONGEST dm_start){
 
 	CORE_ADDR imem_addr = (CORE_ADDR)(pc & 0xFFFFFFFF) *4 \
 			- (CORE_ADDR)(dm_start & 0xFFFFFFFF);
 
 	//for P&E_multilink_universal
-	/*CORE_ADDR imem_addr;
+	CORE_ADDR imem_addr;
 
 	union mem_mapped_dm_start{
 		unsigned long addr;
@@ -190,30 +193,28 @@ apex_pc_to_imem_addr (ULONGEST pc, ULONGEST dm_start){
 				can't read from target memory with target_read_memory\n");
 		return 0;
 	}
-	imem_addr = pc*4 - mem_mapped_dm_start.addr;*/
+	imem_addr = pc*4 - mem_mapped_dm_start.addr;
 
 	return imem_addr;
-}
+}*/
 
 static CORE_ADDR
 apex_read_pc (struct regcache* regcache){
 
-	  ULONGEST pc, dm_start;
+	  ULONGEST dm_start_temp, pc;
 	  regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
-	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start);
-	  CORE_ADDR imem_addr = apex_pc_to_imem_addr (pc, dm_start);
-	  return imem_addr;
+	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start_temp);
+	  apex_apu_data_mem_start = (CORE_ADDR)(dm_start_temp & 0xFFFFFFFF);
+	  return (CORE_ADDR)(pc & 0xFFFFFFFF);
 }
 
 /* Implement the "unwind_pc" gdbarch method.  */
 static CORE_ADDR
 apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame){
 
-	  ULONGEST pc, dm_start;
+	  ULONGEST pc;
 	  pc = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
-	  dm_start = frame_unwind_register_unsigned (this_frame, cmem_if_apu_dm_start_regnum);
-	  CORE_ADDR imem_addr = apex_pc_to_imem_addr (pc, dm_start);
-	  return imem_addr;
+	  return (CORE_ADDR)(pc&0xFFFFFFFF);
 }
 
 /* Implement the "unwind_sp" gdbarch method.  */
@@ -408,8 +409,11 @@ apex_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
 static int
 apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info)
 {
-  info->symbols = NULL;
-  return print_insn_apex (memaddr, info);
+	//struct gdbarch *gdbarch = (struct gdbarch *) info->application_data;
+	//gdbarch->re
+	memaddr=memaddr*4-apex_apu_data_mem_start;
+
+	return print_insn_apex (memaddr, info);
 }
 
 
@@ -423,7 +427,8 @@ apex_gdbarch_init (struct gdbarch_info info,
       
   struct gdbarch       *gdbarch;
   struct gdbarch_tdep  *tdep;
-
+  info.byte_order = BFD_ENDIAN_LITTLE;
+  info.byte_order_for_code = BFD_ENDIAN_LITTLE;
   struct tdesc_arch_data *tdesc_data = NULL;
   const struct target_desc *tdesc=info.target_desc;
   const struct tdesc_feature *feature,*feature_vcu,*feature_ctrl;
@@ -537,7 +542,7 @@ apex_gdbarch_init (struct gdbarch_info info,
     /* Information about the target architecture */
   set_gdbarch_return_value          (gdbarch, apex_return_value);
   set_gdbarch_breakpoint_from_pc    (gdbarch, apex_breakpoint_from_pc);
-  set_gdbarch_bits_big_endian 		(gdbarch, BFD_ENDIAN_LITTLE);
+  //set_gdbarch_bits_big_endian 		(gdbarch, BFD_ENDIAN_LITTLE);
 
   set_tdesc_pseudo_register_type (gdbarch, apex_pseudo_register_type);
 
@@ -566,6 +571,8 @@ apex_gdbarch_init (struct gdbarch_info info,
 
   /* instruction set printer */
   set_gdbarch_print_insn (gdbarch, apex_gdb_print_insn);
+
+
 
   return gdbarch;
 } /* apex_gdbarch_init() */
