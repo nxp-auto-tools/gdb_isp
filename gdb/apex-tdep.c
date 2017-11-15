@@ -407,13 +407,9 @@ apex_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
 }
 
 static int
-apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info)
-{
-	//struct gdbarch *gdbarch = (struct gdbarch *) info->application_data;
-	//gdbarch->re
-	memaddr=memaddr*4-apex_apu_data_mem_start;
+apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
 
-	return print_insn_apex (memaddr, info);
+	return print_insn_apex (memaddr*4-apex_apu_data_mem_start, info);
 }
 
 
@@ -542,7 +538,6 @@ apex_gdbarch_init (struct gdbarch_info info,
     /* Information about the target architecture */
   set_gdbarch_return_value          (gdbarch, apex_return_value);
   set_gdbarch_breakpoint_from_pc    (gdbarch, apex_breakpoint_from_pc);
-  //set_gdbarch_bits_big_endian 		(gdbarch, BFD_ENDIAN_LITTLE);
 
   set_tdesc_pseudo_register_type (gdbarch, apex_pseudo_register_type);
 

@@ -24,8 +24,8 @@ const char* vcs_str[] = {
 		"flip",
 		"pop"
 };
-extern const apex_opc_info_t apex_APC_32b_scalar_opc_info[];//[135];
-extern const apex_opc_info_t apex_APC_32b_vector_opc_info[];//[235];
+extern const apex_opc_info_t apex_APC_32b_scalar_opc_info[];
+extern const apex_opc_info_t apex_APC_32b_vector_opc_info[];
 
 int get_instruction_type (bfd_vma instruction_word);
 const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data);
