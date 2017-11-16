@@ -167,12 +167,6 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{   "vcs_set", 0x40000378U, 0, {gap,gap,gap,		gap,gap}, {0,0,0,0,0},				{0,0,0,0,0},	0x1FFFC07},
 	{      "vcmv", 0x402805D8U, 1, {reg_t,gap,gap,		gap,gap}, {0x3,0,0,0,0},			{22,0,0,0,0},	0x7F807},
 	{     "vcinv", 0x402805D0U, 1, {reg_t,gap,gap,		gap,gap}, {0x3,0,0,0,0},			{22,0,0,0,0},	0x7F807},
-	/*{ "vcspush_l", 0x00000000U, 0x00000000U}, //TODO short instr
-	{ "vcspush_l", 0x00000000U, 0x00000000U}, //TODO short instr
-	{    "vcspop", 0x00000000U, 0x00000000U}, //TODO short instr
-	{   "vcsflip", 0x00000000U, 0x00000000U}, //TODO short instr
-	{   "vcsfpop", 0x00000000U, 0x00000000U}, //TODO short instr
-	{    "vcsnop", 0x00000000U, 0x00000000U}, *///TODO short instr
 				/*Vector Memory LD/ST instructions*/
 	{    	"vlb", 0x46000000U, 4, {reg_t,reg_t,imm_t,vcs_t,gap}, {0x7,0x1F,0xFFF,0x7,0},	{22,17,3,0,0},	0},
 	{      "vlbu", 0x46008000U, 4, {reg_t,reg_t,imm_t,vcs_t,gap}, {0x7,0x1F,0xFFF,0x7,0},	{22,17,3,0,0},	0},
@@ -379,7 +373,6 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{     "vsgtu", 0x400004D0U, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,0,0},0x1003800},
 	{     "vsleu", 0x400004D8U, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,0,0},0x100F800},
 	{     "vsltu", 0x400004E0U, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,0,0},0x100F800},
-
 			/*Vector pointer modification instructions*/
 	{      "padd", 0x40000338U, 3, {reg_t,imm_t,imm_t,gap,gap},		{0x1F,0x3FF,0x3,0,0},		{20,10,0,0,0},0x0},
 	{       "add", 0x540000B8U, 4, {reg_t,reg_t,imm_t,imm_t,gap},	{0x1F,0x1F,0x1F,0x3,0},		{20,15,10,0,0},0x0},
@@ -400,11 +393,11 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{    "vspleu", 0x54000120U, 2, {reg_t,reg_t,gap,gap,gap},		{0x7,0x7,0,0,0},			{22,19,0,0,0},0x7FC07},
 	{    "vspltU", 0x54000128U, 2, {reg_t,reg_t,gap,gap,gap},		{0x7,0x7,0,0,0},			{22,19,0,0,0},0x7FC07},
 	{  		 "Op", 0x400000E8U, 4, {reg_t,reg_t,reg_t,f_t,gap},		{0x7,0x7,0x3,0x1,0},		{22,19,17,16,0},0xFC07},
-	{      "vsel", 0x54000100U, 5, {reg_t,reg_t,reg_t,f_t,reg_t},	{0x7,0x7,0x3,0x1,0x7},	{22,19,17,16,13},0x1807},
-	{      "vsel", 0x54000400U, 5, {reg_t,reg_t,reg_t,f_t,reg_t},	{0x1F,0x7,0x3,0x1,0x7},	{20,17,15,14,22},0x7},
-	{     "vsleu", 0x400004D8U, 4, {reg_t,reg_t,reg_t,reg_t,gap},	{0x3,0x7,0x1F,0x7,0},	{22,19,14,11,0},0x1003800},
-	{     "vsltu", 0x400004E0U, 4, {reg_t,reg_t,reg_t,reg_t,gap},	{0x3,0x7,0x1F,0x7,0},	{22,19,14,11,0},0x1003800},
-	{ NULL, 0, 0, 0}
+	{      "vsel", 0x54000100U, 5, {reg_t,reg_t,reg_t,f_t,reg_t},	{0x7,0x7,0x3,0x1,0x7},		{22,19,17,16,13},0x1807},
+	{      "vsel", 0x54000400U, 5, {reg_t,reg_t,reg_t,f_t,reg_t},	{0x1F,0x7,0x3,0x1,0x7},		{20,17,15,14,22},0x7},
+	{     "vsleu", 0x400004D8U, 4, {reg_t,reg_t,reg_t,reg_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,11,0},0x1003800},
+	{     "vsltu", 0x400004E0U, 4, {reg_t,reg_t,reg_t,reg_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,11,0},0x1003800},
+	{ 		 NULL, 0,			0, {0,0,0,0,0,0},					{0,0,0,0,0,0},				{0,0,0,0,0,0},	0}
 };
 
 /*Scalar-Vector combined instructions*/
