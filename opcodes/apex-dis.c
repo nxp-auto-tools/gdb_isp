@@ -24,8 +24,8 @@ const char* vcs_str[] = {
 		"flip",
 		"pop"
 };
-extern const apex_opc_info_t apex_APC_32b_scalar_opc_info[135];
-extern const apex_opc_info_t apex_APC_32b_vector_opc_info[135];
+extern const apex_opc_info_t apex_APC_32b_scalar_opc_info[];
+extern const apex_opc_info_t apex_APC_32b_vector_opc_info[];
 
 int get_instruction_type (bfd_vma instruction_word);
 const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data);
@@ -53,6 +53,10 @@ int get_instruction_type (bfd_vma instruction_word){ //read first two bit in ins
 const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data){ // brute force yet
 	bfd_vma op_pos;
 	unsigned int ind;
+    if (table == NULL){
+    	fprintf (stderr,"no appropriate opcode table...\n",NULL);
+    	return NULL;
+    }
 	for(;table->name;table++){
 		for (ind=0,op_pos=0;ind<table->num_of_operands;ind++)
 			op_pos|=SHIFT_LEFT(table->op_mask[ind],table->op_offset[ind]);
@@ -98,7 +102,7 @@ int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operand
 }
 
 int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
-	int index;
+	unsigned int index;
 	bfd_vma imm;
 	const char* value_string [16];
 	memset (value_string,0,16);
@@ -150,7 +154,6 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	const apex_opc_info_t* current_instruction;
 	operand operands[6];
 	char instr_string_shape[64];
-
 	memset(instr_string_shape,0,64);
 	memset(operands,0,5*sizeof(operands[0]));
 
@@ -193,11 +196,12 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     	break;
     }
 
+
     current_instruction = finde_in_table(opcode_table,data);
 
     if (current_instruction == NULL){
         info->fprintf_func(info->stream, "0x%08x",data);
-    	return word_instruction_length;
+    	return pc_increment;
     }
     if(extract_operands(current_instruction,operands,data)<0){
     	//fprintf (stderr,"\tNext instruction have no operands:\n",NULL);
@@ -209,5 +213,5 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	    	fprintf (stderr,"Error while composing string!\n",NULL);
 		}
     info->fprintf_func(info->stream, instr_string_shape);
-	return word_instruction_length;
+	return pc_increment;
 }

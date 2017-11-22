@@ -69,6 +69,13 @@ static const char *const vcu_ctl_regs[] = {
 	"vcs6","vcs7"
 };
 
+static const char *const ctrl_regs [] = {
+		"cmem_if_apu_pm_start",
+		"cmem_if_apu_dm_start"
+};
+
+CORE_ADDR apex_apu_data_mem_start;
+
 static struct type *
 apex_builtin_type_vec_512 (struct gdbarch *gdbarch)
 {
@@ -101,7 +108,7 @@ apex_pseudo_register_type (struct gdbarch *gdbarch, int regnum){
 		return bt->builtin_uint32;
  	if (regnum == vcsptr_REGNUM)
 		return bt->builtin_uint8;
-    if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
+    if (regnum>vcsptr_REGNUM && regnum<VCU_REGS_END)
 		return bt->builtin_uint32;
  	//default
  	return bt->builtin_uint32;
@@ -115,8 +122,13 @@ apex_register_name (struct gdbarch *gdbarch,
 		return acp_register_names[regnum];
 	if (regnum>=APEX_ACP_REGS_END && regnum<VECTORS_END)
 		return vcu_gp_regs[regnum-APEX_ACP_REGS_END];
-    if (regnum>=VECTORS_END && regnum<APEX_REGS_TOTAL_NUM)
+    if (regnum>=VECTORS_END && regnum<VCU_REGS_END)
 		return vcu_ctl_regs[regnum-VECTORS_END];
+    if (regnum == cmem_if_apu_pm_start_regnum)
+    	return ctrl_regs[0];
+    if (regnum == cmem_if_apu_dm_start_regnum)
+    	return ctrl_regs[1];
+
   return "no_name";
 }
 
@@ -134,7 +146,7 @@ apex_register_type (struct gdbarch *gdbarch, int regnum){
 		return bt->builtin_uint32;
  	if (regnum == vcsptr_REGNUM)
 		return bt->builtin_uint8;
-    if (regnum>vcsptr_REGNUM && regnum<APEX_REGS_TOTAL_NUM)
+    if (regnum>vcsptr_REGNUM && regnum<VCU_REGS_END)
 		return bt->builtin_uint32;
  	//default
  	return bt->builtin_uint32;
@@ -162,24 +174,54 @@ apex_breakpoint_from_pc (struct gdbarch *gdbarch,
 
 }
 
+/*static CORE_ADDR
+apex_pc_to_imem_addr (ULONGEST pc, ULONGEST dm_start){
+
+	CORE_ADDR imem_addr = (CORE_ADDR)(pc & 0xFFFFFFFF) *4 \
+			- (CORE_ADDR)(dm_start & 0xFFFFFFFF);
+
+	//for P&E_multilink_universal
+	CORE_ADDR imem_addr;
+
+	union mem_mapped_dm_start{
+		unsigned long addr;
+		gdb_byte addr_bytes[4];
+	}mem_mapped_dm_start;
+
+	if(0 > target_read_memory(0x0018000cU,mem_mapped_dm_start.addr_bytes,4)){
+		fprintf(stderr,"_apex_pc_to_imem_addr_: \
+				can't read from target memory with target_read_memory\n");
+		return 0;
+	}
+	imem_addr = pc*4 - mem_mapped_dm_start.addr;
+
+	return imem_addr;
+}*/
+
+static CORE_ADDR
+apex_read_pc (struct regcache* regcache){
+
+	  ULONGEST dm_start_temp, pc;
+	  regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
+	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start_temp);
+	  apex_apu_data_mem_start = (CORE_ADDR)(dm_start_temp & 0xFFFFFFFF);
+	  return (CORE_ADDR)(pc & 0xFFFFFFFF);
+}
 
 /* Implement the "unwind_pc" gdbarch method.  */
 static CORE_ADDR
-apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame)
-{
-	/*TODO: pc mapping: pc*word_length(4)+APEX_BASE_ADDR(0x74000000)*/
+apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame){
 
-  CORE_ADDR pc
-    = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
-
-  return pc;
+	  ULONGEST pc;
+	  pc = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
+	  return (CORE_ADDR)(pc&0xFFFFFFFF);
 }
 
 /* Implement the "unwind_sp" gdbarch method.  */
 static CORE_ADDR
 apex_unwind_sp (struct gdbarch *gdbarch, struct frame_info *this_frame)
 {
-  return frame_unwind_register_unsigned (this_frame, APEX_SP_REGNUM);
+	return frame_unwind_register_unsigned (this_frame, APEX_SP_REGNUM);
 }
 /* apex cache structure.  */
 struct apex_unwind_cache
@@ -365,10 +407,9 @@ apex_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
 }
 
 static int
-apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info)
-{
-  info->symbols = NULL;
-  return print_insn_apex (memaddr, info);
+apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
+
+	return print_insn_apex (memaddr*4-apex_apu_data_mem_start, info);
 }
 
 
@@ -382,10 +423,11 @@ apex_gdbarch_init (struct gdbarch_info info,
       
   struct gdbarch       *gdbarch;
   struct gdbarch_tdep  *tdep;
-
+  info.byte_order = BFD_ENDIAN_LITTLE;
+  info.byte_order_for_code = BFD_ENDIAN_LITTLE;
   struct tdesc_arch_data *tdesc_data = NULL;
   const struct target_desc *tdesc=info.target_desc;
-  const struct tdesc_feature *feature,*feature_vcu;
+  const struct tdesc_feature *feature,*feature_vcu,*feature_ctrl;
 
   int i;
   int valid_p = 1;
@@ -451,17 +493,33 @@ apex_gdbarch_init (struct gdbarch_info info,
     valid_p &= tdesc_numbered_register (feature_vcu, tdesc_data, i,
                                         vcu_gp_regs[i-APEX_ACP_REGS_END]);
   }
-  for (i;i<APEX_REGS_TOTAL_NUM;i++){
+  for (i;i<VCU_REGS_END;i++){
 	    valid_p &= tdesc_numbered_register (feature_vcu, tdesc_data, i,
 	                                        vcu_ctl_regs[i-VECTORS_END]);
-
   }
+  if (!valid_p){
+     tdesc_data_cleanup (tdesc_data);
+     return NULL;
+  }
+  feature_ctrl = tdesc_find_feature(tdesc,"org.gnu.gdb.apex.apu.acp.dbg");
+
+  if (feature_ctrl == NULL){
+    error ("apex_gdbarch_init: no feature org.gnu.gdb.apex.apu.acp.dbg");
+    return NULL;
+  }
+  valid_p &= tdesc_numbered_register (feature_ctrl, tdesc_data, i,
+	  	  	  	  	  	  	  	  	  ctrl_regs[i-VCU_REGS_END]);
+  i++;
+  valid_p &= tdesc_numbered_register (feature_ctrl, tdesc_data, i,
+		  	  	  	  	  	  	  	  ctrl_regs[i-VCU_REGS_END]);
+  i++;
   if (!valid_p){
      tdesc_data_cleanup (tdesc_data);
      return NULL;
   } else {
       regs_num += i;
   }
+
 
   tdep = XCNEW (struct gdbarch_tdep);
   gdbarch = gdbarch_alloc (&info, tdep);
@@ -480,7 +538,6 @@ apex_gdbarch_init (struct gdbarch_info info,
     /* Information about the target architecture */
   set_gdbarch_return_value          (gdbarch, apex_return_value);
   set_gdbarch_breakpoint_from_pc    (gdbarch, apex_breakpoint_from_pc);
-  set_gdbarch_bits_big_endian 		(gdbarch, BFD_ENDIAN_LITTLE);
 
   set_tdesc_pseudo_register_type (gdbarch, apex_pseudo_register_type);
 
@@ -497,6 +554,9 @@ apex_gdbarch_init (struct gdbarch_info info,
   set_gdbarch_unwind_sp (gdbarch, apex_unwind_sp);  
   frame_unwind_append_unwinder (gdbarch, &apex_frame_unwind);
 
+  /* Program counter */
+  set_gdbarch_read_pc (gdbarch, apex_read_pc);
+
   /* Functions to analyse frames */
   set_gdbarch_skip_prologue         (gdbarch, apex_skip_prologue);
   set_gdbarch_inner_than            (gdbarch, core_addr_lessthan);
@@ -506,6 +566,8 @@ apex_gdbarch_init (struct gdbarch_info info,
 
   /* instruction set printer */
   set_gdbarch_print_insn (gdbarch, apex_gdb_print_insn);
+
+
 
   return gdbarch;
 } /* apex_gdbarch_init() */

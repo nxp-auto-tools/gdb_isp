@@ -89,5 +89,6 @@ initialize_tdesc_apex_apu (void)
   tdesc_create_reg (feature, "cmem_if_apu_pm_start", 56, 1, "system", 32, "uint32");
   tdesc_create_reg (feature, "cmem_if_apu_dm_start", 57, 1, "system", 32, "uint32");
 
+
   tdesc_apex = result;
 }
