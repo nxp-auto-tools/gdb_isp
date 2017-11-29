@@ -194,7 +194,6 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     default:
         info->fprintf_func(info->stream, "0x%08x",data);
     	return pc_increment;
-    	break;
     }
 
 
