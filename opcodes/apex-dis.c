@@ -53,10 +53,6 @@ int get_instruction_type (bfd_vma instruction_word){ //read first two bit in ins
 const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma data){ // brute force yet
 	bfd_vma op_pos;
 	unsigned int ind;
-    if (table == NULL){
-    	fprintf (stderr,"no appropriate opcode table...\n",NULL);
-    	return NULL;
-    }
 	for(;table->name;table++){
 		for (ind=0,op_pos=0;ind<table->num_of_operands;ind++)
 			op_pos|=SHIFT_LEFT(table->op_mask[ind],table->op_offset[ind]);
@@ -192,8 +188,8 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     case scalar64_instruction_type:
    // 	break;
     default:
-    	//fprintf (stderr,"Wrong instruction type\n",NULL);
-    	break;
+        info->fprintf_func(info->stream, "0x%08x",data);
+    	return pc_increment;
     }
 
 
