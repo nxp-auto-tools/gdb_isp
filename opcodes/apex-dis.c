@@ -182,17 +182,22 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     case scalar_instruction_type:
     	compose_mnemonic = compose_scalar_mnemonic;
     	opcode_table = apex_APC_32b_scalar_opc_info;
+    	//fprintf (stderr,"Scalar instruction type\n",NULL);
+
     	break;
     case vector_instruction_type:
     	compose_mnemonic = compose_vector_mnemonic;
     	opcode_table = apex_APC_32b_vector_opc_info;
+    	//fprintf (stderr,"Vector instruction type\n",NULL);
+
     	break;
     case combined_instruction_type:
   //  	break;
     case scalar64_instruction_type:
    // 	break;
     default:
-    	//fprintf (stderr,"Wrong instruction type\n",NULL);
+        info->fprintf_func(info->stream, "0x%08x",data);
+    	return pc_increment;
     	break;
     }
 
