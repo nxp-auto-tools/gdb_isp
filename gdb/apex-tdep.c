@@ -410,7 +410,6 @@ static int
 apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
 
 	return print_insn_apex (memaddr*4-apex_apu_data_mem_start, info);
-	//return print_insn_apex (memaddr*4, info);
 }
 
 
