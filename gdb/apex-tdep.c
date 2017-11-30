@@ -202,40 +202,9 @@ static CORE_ADDR
 apex_read_pc (struct regcache* regcache){
 
 	  ULONGEST dm_start_temp, pc;
-	  enum register_status reg_status;
-
-	  reg_status = regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
-
-	  switch (reg_status){
-	  case REG_UNKNOWN:
-		  fprintf(stderr, "__apex_read_pc:  PC is Unknown?\n");
-		  break;
-	  case REG_UNAVAILABLE:
-		  fprintf(stderr, "__apex_read_pc:  PC is Unavailable\n");
-		  break;
-	  case REG_VALID:
-	  default:
-		  break;
-	  }
-
-	  reg_status = regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start_temp);
-
-	  switch (reg_status){
-	  case REG_UNKNOWN:
-		  fprintf(stderr, "__apex_read_pc:  cmem_if_apu_dm_start_regnum is Unknown\n");
-		  dm_start_temp = 0;
-		  break;
-	  case REG_UNAVAILABLE:
-		  fprintf(stderr, "__apex_read_pc:  cmem_if_apu_dm_start_regnum is Unavailable\n");
-		  dm_start_temp = 0;
-		  break;
-	  case REG_VALID:
-	  default:
-		  break;
-	  }
-
+	  regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
+	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start_temp);
 	  apex_apu_data_mem_start = (CORE_ADDR)(dm_start_temp & 0xFFFFFFFF);
-	  fprintf(stderr,"DM_start = %d\n",dm_start_temp);
 	  return (CORE_ADDR)(pc & 0xFFFFFFFF);
 }
 
