@@ -2,6 +2,7 @@
 #define _APEX_DIS_H_
 
 const unsigned int word_instruction_length = 4;
+const unsigned int bits_per_word = word_instruction_length * 8;
 const unsigned int pc_increment = 1;//one word
 enum instruction_type{
 	scalar_instruction_type,
