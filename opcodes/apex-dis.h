@@ -3,7 +3,7 @@
 
 const unsigned int word_instruction_length = 4;
 const unsigned int bits_per_word = 32;
-const unsigned int little_endian = 0;
+const unsigned int is_big_endian = 0;
 const unsigned int pc_increment = 1;//one word
 enum instruction_type{
 	scalar_instruction_type,
