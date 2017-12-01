@@ -423,8 +423,6 @@ apex_gdbarch_init (struct gdbarch_info info,
       
   struct gdbarch       *gdbarch;
   struct gdbarch_tdep  *tdep;
-  info.byte_order = BFD_ENDIAN_LITTLE;
-  info.byte_order_for_code = BFD_ENDIAN_LITTLE;
   struct tdesc_arch_data *tdesc_data = NULL;
   const struct target_desc *tdesc=info.target_desc;
   const struct tdesc_feature *feature,*feature_vcu,*feature_ctrl;

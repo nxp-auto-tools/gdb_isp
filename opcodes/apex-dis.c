@@ -171,7 +171,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
       return -1;
     }*/
 
-    bfd_vma data = bfd_get_bits (instr_low_bytes, word_instruction_length * 8, info->display_endian == BFD_ENDIAN_LITTLE);
+    bfd_vma data = bfd_get_bits (instr_low_bytes, bits_per_word, is_big_endian);
 
     switch (get_instruction_type(data)){
 
