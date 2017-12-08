@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2015-2016 Free Software Foundation, Inc.
+     Contributed by NXP.
+
+     Copying and distribution of this file, with or without modification,
+     are permitted in any medium without royalty provided the copyright
+     notice and this notice are preserved.  -->
+
+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
+<feature name="isp-ipus-core-regs">
+  <reg name="pc" bitsize="32" type="code_ptr"/>
+</feature>

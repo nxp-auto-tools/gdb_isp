@@ -2344,6 +2344,10 @@ enum bfd_architecture
 #define bfd_mach_nios2r2       2
   bfd_arch_visium,     /* Visium */
 #define bfd_mach_visium        1
+  bfd_arch_isp,		/* ISP */
+#define bfd_mach_isp	1
+#define bfd_mach_isp_ipus	101
+#define bfd_mach_isp_ipuv	201
   bfd_arch_last
   };
 

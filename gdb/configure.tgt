@@ -269,6 +269,11 @@ iq2000-*-*)
 	gdb_target_obs="iq2000-tdep.o"
 	gdb_sim=../sim/iq2000/libsim.a
 	;;
+	
+isp*-*)
+	#Target: ISP
+	gdb_target_obs="isp-tdep.o"
+	;;
 
 lm32-*-*)		
 	gdb_target_obs="lm32-tdep.o" 
