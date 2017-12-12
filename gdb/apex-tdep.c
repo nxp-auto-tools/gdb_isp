@@ -75,6 +75,7 @@ static const char *const ctrl_regs [] = {
 };
 
 CORE_ADDR apex_apu_data_mem_start;
+CORE_ADDR apex_apu_prog_mem_start;
 
 static struct type *
 apex_builtin_type_vec_512 (struct gdbarch *gdbarch)
@@ -201,10 +202,13 @@ apex_pc_to_imem_addr (ULONGEST pc, ULONGEST dm_start){
 static CORE_ADDR
 apex_read_pc (struct regcache* regcache){
 
-	  ULONGEST dm_start_temp, pc;
+	  ULONGEST dm_start_temp, pm_start_temp, pc;
 	  regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
 	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start_temp);
 	  apex_apu_data_mem_start = (CORE_ADDR)(dm_start_temp & 0xFFFFFFFF);
+	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_pm_start_regnum, &pm_start_temp);
+	  apex_apu_prog_mem_start = (CORE_ADDR)(pm_start_temp & 0xFFFFFFFF);
+
 	  return (CORE_ADDR)(pc & 0xFFFFFFFF);
 }
 
@@ -405,7 +409,16 @@ apex_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
 
   return -1;
 }
+static CORE_ADDR
+apex_adjust_dwarf2_addr (CORE_ADDR elf_addr)
+{
+	CORE_ADDR pc = (elf_addr + apex_apu_prog_mem_start)/4;
+	fprintf(stderr,"apex_apu_prog_mem_start = 0x%08x\n",apex_apu_prog_mem_start);
+	fprintf(stderr,"elf_addr = 0x%08x\n",elf_addr);
+	fprintf(stderr,"resulting PC = 0x%08x\n",pc);
 
+	return pc;
+}
 static int
 apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
 
@@ -533,14 +546,20 @@ apex_gdbarch_init (struct gdbarch_info info,
   set_gdbarch_sp_regnum (gdbarch, APEX_SP_REGNUM);
   set_gdbarch_num_regs  (gdbarch, regs_num);
 
-    /* Information about the target architecture */
+  /* Information about the target architecture */
   set_gdbarch_return_value          (gdbarch, apex_return_value);
   set_gdbarch_breakpoint_from_pc    (gdbarch, apex_breakpoint_from_pc);
 
   set_tdesc_pseudo_register_type (gdbarch, apex_pseudo_register_type);
 
-    /* Internal <-> external register number maps.  */
+  /* Internal <-> external register number maps.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, apex_dwarf_reg_to_regnum);
+  //set_gdbarch_adjust_dwarf2_data_uoffset (gdbarch, vspa2_adjust_dwarf2_data_uoffset);
+  //set_gdbarch_adjust_dwarf2_data_offset (gdbarch, vspa2_adjust_dwarf2_data_offset);
+  //set_gdbarch_adjust_dwarf2_data_addr (gdbarch, vspa2_adjust_dwarf2_data_addr);
+  set_gdbarch_adjust_dwarf2_addr (gdbarch, apex_adjust_dwarf2_addr);
+  //set_gdbarch_adjust_dwarf2_line (gdbarch, vspa2_adjust_dwarf2_line);
+
 
   /* Functions to supply register information */
   set_gdbarch_register_name         (gdbarch, apex_register_name);
