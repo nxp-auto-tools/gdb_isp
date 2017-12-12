@@ -554,11 +554,11 @@ apex_gdbarch_init (struct gdbarch_info info,
 
   /* Internal <-> external register number maps.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, apex_dwarf_reg_to_regnum);
-  //set_gdbarch_adjust_dwarf2_data_uoffset (gdbarch, vspa2_adjust_dwarf2_data_uoffset);
-  //set_gdbarch_adjust_dwarf2_data_offset (gdbarch, vspa2_adjust_dwarf2_data_offset);
-  //set_gdbarch_adjust_dwarf2_data_addr (gdbarch, vspa2_adjust_dwarf2_data_addr);
+  //set_gdbarch_adjust_dwarf2_data_uoffset (gdbarch, apex_adjust_dwarf2_data_uoffset);
+  //set_gdbarch_adjust_dwarf2_data_offset (gdbarch, apex_adjust_dwarf2_data_offset);
+  //set_gdbarch_adjust_dwarf2_data_addr (gdbarch, apex_adjust_dwarf2_data_addr);
   set_gdbarch_adjust_dwarf2_addr (gdbarch, apex_adjust_dwarf2_addr);
-  //set_gdbarch_adjust_dwarf2_line (gdbarch, vspa2_adjust_dwarf2_line);
+  //set_gdbarch_adjust_dwarf2_line (gdbarch, apex_adjust_dwarf2_line);
 
 
   /* Functions to supply register information */
