@@ -412,12 +412,8 @@ apex_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
 static CORE_ADDR
 apex_adjust_dwarf2_addr (CORE_ADDR elf_addr)
 {
-	CORE_ADDR pc = (elf_addr + apex_apu_prog_mem_start)/4;
-	fprintf(stderr,"apex_apu_prog_mem_start = 0x%08x\n",apex_apu_prog_mem_start);
-	fprintf(stderr,"elf_addr = 0x%08x\n",elf_addr);
-	fprintf(stderr,"resulting PC = 0x%08x\n",pc);
-
-	return pc;
+	CORE_ADDR apu_addr = elf_addr*4 - apex_apu_data_mem_start;
+	return apu_addr;
 }
 static int
 apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
@@ -554,9 +550,6 @@ apex_gdbarch_init (struct gdbarch_info info,
 
   /* Internal <-> external register number maps.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, apex_dwarf_reg_to_regnum);
-  //set_gdbarch_adjust_dwarf2_data_uoffset (gdbarch, apex_adjust_dwarf2_data_uoffset);
-  //set_gdbarch_adjust_dwarf2_data_offset (gdbarch, apex_adjust_dwarf2_data_offset);
-  //set_gdbarch_adjust_dwarf2_data_addr (gdbarch, apex_adjust_dwarf2_data_addr);
   set_gdbarch_adjust_dwarf2_addr (gdbarch, apex_adjust_dwarf2_addr);
   //set_gdbarch_adjust_dwarf2_line (gdbarch, apex_adjust_dwarf2_line);
 
