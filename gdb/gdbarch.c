@@ -572,14 +572,14 @@ verify_gdbarch (struct gdbarch *gdbarch)
   /* Skip verify of integer_to_address, has predicate.  */
   /* Skip verify of return_value, has predicate.  */
   /* Skip verify of return_in_first_hidden_param_p, invalid_p == 0 */
-  if (gdbarch->skip_prologue == 0)
-    fprintf_unfiltered (log, "\n\tskip_prologue");
+  //if (gdbarch->skip_prologue == 0)
+  //  fprintf_unfiltered (log, "\n\tskip_prologue");
   /* Skip verify of skip_main_prologue, has predicate.  */
   /* Skip verify of skip_entrypoint, has predicate.  */
-  if (gdbarch->inner_than == 0)
-    fprintf_unfiltered (log, "\n\tinner_than");
-  if (gdbarch->breakpoint_from_pc == 0)
-    fprintf_unfiltered (log, "\n\tbreakpoint_from_pc");
+  //if (gdbarch->inner_than == 0)
+  //  fprintf_unfiltered (log, "\n\tinner_than");
+  //if (gdbarch->breakpoint_from_pc == 0)
+  //  fprintf_unfiltered (log, "\n\tbreakpoint_from_pc");
   /* Skip verify of remote_breakpoint_from_pc, invalid_p == 0 */
   /* Skip verify of adjust_breakpoint_address, has predicate.  */
   /* Skip verify of memory_insert_breakpoint, invalid_p == 0 */

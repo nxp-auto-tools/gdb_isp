@@ -843,6 +843,7 @@ case "${targ}" in
     ;;
     
   isp*)
+    targ_defvec=isp_elf32_le_vec
     ;;
 
   lm32-*-elf | lm32-*-rtems*)

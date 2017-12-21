@@ -35,6 +35,7 @@
 #include "isp-tdep.h"
 #include "features/isp-ipus.c"
 #include "features/isp-ipuv.c"
+//#include "opcodes/isp-dis.h"
 #include "target.h"
 #include "objfiles.h"
 
@@ -42,23 +43,70 @@
 /* Provide a prototype to silence -Wmissing-prototypes.  */
 void _initialize_isp_tdep (void);
 
-static struct gdbarch *
-isp_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+/* List of required functions
+num_regs
+register_name
+*/
+
+static char *register_names[] = {"pc"};
+
+
+static const char *
+isp_register_name (struct gdbarch *gdbarch, int regnum)
 {
-  //_initialize_isp_tdep();
-	struct gdbarch       *gdbarch;
+	if (regnum >= 0 && regnum < ARRAY_SIZE(register_names))
+		return register_names[regnum];
 
-	gdbarch = gdbarch_alloc (&info, NULL);
+    return NULL;
+}
 
-	set_gdbarch_print_insn (gdbarch, print_insn_isp);
-  return (gdbarch);
+static struct type *
+isp_register_type (struct gdbarch *arch,
+		    int             regnum)
+{
+  //TODO:
+  return builtin_type (arch)->builtin_uint32;
 }
 
 
+static struct gdbarch *
+isp_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+{
+    //_initialize_isp_tdep();
+    struct gdbarch       *gdbarch;
+    int		mach;
+
+    arches = gdbarch_list_lookup_by_info(arches, &info);
+    if (arches != NULL)
+        return arches->gdbarch;
+
+    if (info.bfd_arch_info != NULL)
+    	mach = info.bfd_arch_info->mach;
+    else
+    	mach = bfd_mach_isp_ipus;
+
+    gdbarch = gdbarch_alloc (&info, NULL);
+
+    //This function must be called depends on architecture
+    if (mach == bfd_mach_isp_ipus)
+    	set_gdbarch_print_insn(gdbarch, print_insn_isp_ipus);
+    else
+    	set_gdbarch_print_insn(gdbarch, print_insn_isp_ipuv);
+
+    set_gdbarch_register_name(gdbarch, isp_register_name);
+    set_gdbarch_register_type(gdbarch, isp_register_type);
+    //set_gdbarch_bite_order(gdbarch, BFD_ENDIAN_LITTLE);
+    //(*gdbarch)->byte_order = BFD_ENDIAN_LITTLE;
+    set_gdbarch_num_regs(gdbarch, 1);
+    
+    return (gdbarch);
+}
+
+/*Call back from the initialize_all_files()*/
 void
 _initialize_isp_tdep (void)
 {
-  gdbarch_register (bfd_arch_isp, isp_gdbarch_init, NULL);
-  initialize_tdesc_isp_ipus ();
-  initialize_tdesc_isp_ipuv ();
+    gdbarch_register (bfd_arch_isp, isp_gdbarch_init, NULL);
+    initialize_tdesc_isp_ipus ();
+    initialize_tdesc_isp_ipuv ();
 }

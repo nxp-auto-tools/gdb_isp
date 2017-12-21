@@ -239,7 +239,10 @@ disassembler (bfd *abfd)
 #endif
 #ifdef ARCH_isp
     case bfd_arch_isp:
-      disassemble = print_insn_isp;
+      if (bfd_get_mach(abfd) == bfd_mach_isp_ipus)
+        disassemble = print_insn_isp_ipus;
+      else if (bfd_get_mach(abfd) == bfd_mach_isp_ipuv)
+        disassemble = print_insn_isp_ipuv;
       break;
 #endif
 #ifdef ARCH_epiphany

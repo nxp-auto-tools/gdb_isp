@@ -15,7 +15,7 @@ initialize_tdesc_isp_ipus (void)
   set_tdesc_architecture (result, bfd_scan_arch ("isp-ipus"));
 
   feature = tdesc_create_feature (result, "isp-ipus1-core-regs");
-  tdesc_create_reg (feature, "pc", 0, 1, NULL, 32, "code_ptr");
+  tdesc_create_reg (feature, "pc", 0, 1, NULL, 32, "uint32");
   
 
   tdesc_isp_ipus = result;
