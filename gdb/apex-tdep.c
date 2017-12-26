@@ -409,12 +409,27 @@ apex_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
 
   return -1;
 }
+
+/* symbolic address comes in word representation (divided by 4)
+ * into this func and data seems in byte representation (as is)*/
 static CORE_ADDR
 apex_adjust_dwarf2_addr (CORE_ADDR elf_addr)
 {
-	CORE_ADDR apu_addr = elf_addr*4 - apex_apu_data_mem_start;
+	CORE_ADDR apu_addr = elf_addr;
+	apu_addr = elf_addr*4 + apex_apu_prog_mem_start;
+	apu_addr>>=2; //dividing by 4 (byte-to-word addressing)
+	fprintf(stderr,"adjust_dwarf2_addr: elf_addr= 0x%08x apu_addr= 0x%08x\n",elf_addr,apu_addr);
 	return apu_addr;
 }
+
+static CORE_ADDR
+apex_adjust_dwarf2_line (CORE_ADDR elf_addr, int rel)
+{
+	CORE_ADDR apu_addr = elf_addr;
+	fprintf(stderr,"adjust_dwarf2_line: elf_addr= 0x%08x rel = %d\n",elf_addr,rel);
+	return apu_addr;
+}
+
 static int
 apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
 
@@ -551,7 +566,7 @@ apex_gdbarch_init (struct gdbarch_info info,
   /* Internal <-> external register number maps.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, apex_dwarf_reg_to_regnum);
   set_gdbarch_adjust_dwarf2_addr (gdbarch, apex_adjust_dwarf2_addr);
-  //set_gdbarch_adjust_dwarf2_line (gdbarch, apex_adjust_dwarf2_line);
+  set_gdbarch_adjust_dwarf2_line (gdbarch, apex_adjust_dwarf2_line);
 
 
   /* Functions to supply register information */
