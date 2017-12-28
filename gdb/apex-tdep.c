@@ -75,7 +75,6 @@ static const char *const ctrl_regs [] = {
 };
 
 CORE_ADDR apex_apu_data_mem_start;
-CORE_ADDR apex_apu_prog_mem_start;
 
 static struct type *
 apex_builtin_type_vec_512 (struct gdbarch *gdbarch)
