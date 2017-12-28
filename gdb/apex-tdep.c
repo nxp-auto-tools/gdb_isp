@@ -533,13 +533,13 @@ apex_gdbarch_init (struct gdbarch_info info,
   set_gdbarch_sp_regnum (gdbarch, APEX_SP_REGNUM);
   set_gdbarch_num_regs  (gdbarch, regs_num);
 
-  /* Information about the target architecture */
+   /* Information about the target architecture */
   set_gdbarch_return_value          (gdbarch, apex_return_value);
   set_gdbarch_breakpoint_from_pc    (gdbarch, apex_breakpoint_from_pc);
 
   set_tdesc_pseudo_register_type (gdbarch, apex_pseudo_register_type);
 
-  /* Internal <-> external register number maps.  */
+   /* Internal <-> external register number maps.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, apex_dwarf_reg_to_regnum);
 
   /* Functions to supply register information */
