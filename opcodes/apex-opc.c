@@ -105,7 +105,7 @@ const apex_opc_info_t apex_APC_32b_scalar_opc_info[] =
 		/*ACP Logical instructions*/
 	{       "and", 0x00000005UL, 3, {reg_t,reg_t,reg_t,	gap,gap}, {0x1F,0x1F,0x1F,0,0},		{20,15,10,0,0}, 0x300},
 	{      "andi", 0x06800000UL, 2, {reg_t,imm_t,gap,	gap,gap}, {0x1F,0xFFFF,0,0,0},		{16,0,0,0,0},	0},
-	{      "andi", 0x2C000000UL, 3, {reg_t,reg_t,reg_t,	gap,gap}, {0x1F,0x1F,0x7fff,0,0},	{20,15,0,0,0},	0},
+	{       "ori", 0x2C000000UL, 3, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0x1F,0x7fff,0,0},	{20,15,0,0,0},	0},
 	{        "or", 0x0000000DUL, 3, {reg_t,reg_t,reg_t,	gap,gap}, {0x1F,0x1F,0x1F,0,0},		{20,15,10,0,0}, 0x300},
 	{       "ori", 0x06A00000UL, 2, {reg_t,imm_t,gap,	gap,gap}, {0x1F,0xFFFF,0,0,0},		{16,0,0,0,0},	0},
 	{       "ori", 0x27000000UL, 3, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0x1F,0x7fff,0,0},	{20,15,0,0,0},	0},

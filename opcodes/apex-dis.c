@@ -30,7 +30,8 @@ extern const apex_opc_info_t apex_APC_32b_vector_opc_info[];
 
 int get_instruction_type (bfd_vma instruction_word);
 const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma insn_bits);
-const apex_opc_info_t* finde_in_table_second_insn_part (const apex_opc_info_t* table, bfd_vma insn_bits);
+const apex_opc_info_t* finde_in_table_scalar_insn_part (const apex_opc_info_t* table, bfd_vma insn_bits);
+const apex_opc_info_t* finde_in_table_vector_insn_part (const apex_opc_info_t* table, bfd_vma insn_bits);
 const apex_64_bit_opc_info_t* finde_in_vliw_table (const apex_64_bit_opc_info_t* table, vliw_t insn_bits);
 int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma insn_bits);
 int extract_vliw_operands (const apex_64_bit_opc_info_t* operation,operand* operands,vliw_t insn_bits);
@@ -67,7 +68,19 @@ const apex_opc_info_t* finde_in_table (const apex_opc_info_t* table, bfd_vma ins
 	}
 	return NULL;
 }
-const apex_opc_info_t* finde_in_table_second_insn_part (const apex_opc_info_t* table, bfd_vma insn_bits){ // brute force yet
+const apex_opc_info_t* finde_in_table_scalar_insn_part (const apex_opc_info_t* table, bfd_vma insn_bits){ // brute force yet
+	bfd_vma op_pos;//operand position
+	unsigned int ind;
+	for(;table->name;table++){
+		for (ind=0,op_pos=0;ind<table->num_of_operands;ind++)
+			op_pos|=SHIFT_LEFT(table->op_mask[ind],table->op_offset[ind]);
+		op_pos|=table->non_read_pos;
+		if (((insn_bits) & ~op_pos) == (table->opcode | 0x80000000))
+			return table;
+	}
+	return NULL;
+}
+const apex_opc_info_t* finde_in_table_vector_insn_part (const apex_opc_info_t* table, bfd_vma insn_bits){ // brute force yet
 	bfd_vma op_pos;//operand position
 	unsigned int ind;
 	for(;table->name;table++){
@@ -140,8 +153,8 @@ int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operand
 }
 int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,operand* operands, char* string){
 	unsigned int index;
-	char value_string [16];
-	memset (value_string,0,16);
+	char value_string [8];
+	memset (value_string,0,8);
 	strcat(string, instruction->name);
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
@@ -169,8 +182,8 @@ int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,opera
 int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
 	unsigned int index;
 	long imm;
-	char value_string [16];
-	memset (value_string,0,16);
+	char value_string [8];
+	memset (value_string,0,8);
 	strcat(string, instruction->name);
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
@@ -260,32 +273,30 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         low_bits = bfd_get_bits (instr_low_bytes, bits_per_word, is_big_endian);
 
     	opcode_table = apex_APC_32b_scalar_opc_info;
-    	scalar_insn_part = finde_in_table(opcode_table,high_bits);
+    	scalar_insn_part = finde_in_table_scalar_insn_part(opcode_table,high_bits);
      	opcode_table = apex_APC_32b_vector_opc_info;
-    	vector_insn_part = finde_in_table_second_insn_part(opcode_table,low_bits);
-        info->fprintf_func(info->stream, "vliw_start ");
+    	vector_insn_part = finde_in_table_vector_insn_part(opcode_table,low_bits);
+        info->fprintf_func(info->stream, "_vliw ");
 
     	compose_mnemonic = compose_scalar_mnemonic;
         if (scalar_insn_part != NULL){
         	extract_operands(scalar_insn_part,operands,high_bits);
         	if(compose_mnemonic(scalar_insn_part,operands,insns_mnemonic)>0){
-        		info->fprintf_func(info->stream, "%s",insns_mnemonic);
+    			strcat(insns_mnemonic," ");
         		compose_mnemonic = compose_vector_mnemonic;
         		if (vector_insn_part != NULL){
         			extract_operands(vector_insn_part,operands,high_bits);
         			if(compose_mnemonic(vector_insn_part,operands,insns_mnemonic)>0){
-        				info->fprintf_func(info->stream, "%s", insns_mnemonic);
-        		        info->fprintf_func(info->stream, " vliw_end");
+        				info->fprintf_func(info->stream, " %s", insns_mnemonic);
         				return double_word;
         			}
         		}
         	}
         }
 
-        fprintf (stderr,"_print_insn: unparsed command with addr=0x%08lx\n",cur_insn_addr);
-        info->fprintf_func(info->stream, "0x%08lx",high_bits);
-        info->fprintf_func(info->stream, " 0x%08lx",low_bits);
-        info->fprintf_func(info->stream, " vliw_end");
+        fprintf (stderr,"_print_insn_combined_: unparsed command with addr=0x%08lx\n",cur_insn_addr);
+        info->fprintf_func(info->stream, "0x%08lx ",high_bits);
+        info->fprintf_func(info->stream, "0x%08lx ",low_bits);
 		return double_word;
 
     case scalar64_instruction_type:
@@ -307,21 +318,18 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         const apex_64_bit_opc_info_t *vliw_opcode_table=apex_APC_64b_scalar_opc_info;
 
     	const apex_64_bit_opc_info_t *vliw_insn_entity = finde_in_vliw_table(vliw_opcode_table,vliw_insn_value);
-        info->fprintf_func(info->stream, "vliw_start ");
+        info->fprintf_func(info->stream, "_vliw ");
 
         if (vliw_insn_entity != NULL){
         	extract_vliw_operands(vliw_insn_entity,operands,vliw_insn_value);
         	if(compose_64b_scalar_mnemonic(vliw_insn_entity,operands,insns_mnemonic)>0){
         		info->fprintf_func(info->stream, "%s",insns_mnemonic);
-                info->fprintf_func(info->stream, " vliw_end");
-
         		return double_word;
         	}
         }
-        fprintf (stderr,"_print_insn: unparsed command with addr=0x%08lx\n",cur_insn_addr);
-        info->fprintf_func(info->stream, "0x%08lx",high_bits);
-        info->fprintf_func(info->stream, " 0x%08lx",low_bits);
-        info->fprintf_func(info->stream, " vliw_end");
+        fprintf (stderr,"_print_insn_scalar_64b_: unparsed command with addr=0x%08lx\n",cur_insn_addr);
+        info->fprintf_func(info->stream, "0x%08lx ",high_bits);
+        info->fprintf_func(info->stream, "0x%08lx ",low_bits);
 		return double_word;
 
     default:
