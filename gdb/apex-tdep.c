@@ -418,7 +418,7 @@ apex_adjust_dwarf2_addr (CORE_ADDR elf_addr)
 	CORE_ADDR apu_addr = elf_addr;
 	apu_addr = elf_addr*4 + apex_apu_prog_mem_start;
 	apu_addr>>=2; //dividing by 4 (byte-to-word addressing)
-	fprintf(stderr,"adjust_dwarf2_addr: elf_addr= 0x%08x apu_addr= 0x%08x\n",elf_addr,apu_addr);
+	//fprintf(stderr,"adjust_dwarf2_addr: elf_addr= 0x%08x apu_addr= 0x%08x\n",elf_addr,apu_addr);
 	return apu_addr;
 }
 
@@ -426,7 +426,7 @@ static CORE_ADDR
 apex_adjust_dwarf2_line (CORE_ADDR elf_addr, int rel)
 {
 	CORE_ADDR apu_addr = elf_addr;
-	fprintf(stderr,"adjust_dwarf2_line: elf_addr= 0x%08x rel = %d\n",elf_addr,rel);
+	//fprintf(stderr,"adjust_dwarf2_line: elf_addr= 0x%08x rel = %d\n",elf_addr,rel);
 	return apu_addr;
 }
 

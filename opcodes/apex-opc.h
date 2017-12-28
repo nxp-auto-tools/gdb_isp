@@ -35,4 +35,16 @@ typedef struct apex_opc_info_t
 
 } apex_opc_info_t;
 
+typedef struct apex_64_bit_opc_info_t
+{
+  const char *name;
+  unsigned long long opcode;
+  unsigned int num_of_operands;
+  operand_type op_type[6];
+  unsigned long long op_mask[6];
+  unsigned int op_offset[6];
+  unsigned long long non_read_pos;
+
+} apex_64_bit_opc_info_t;
+
 #endif // OPCODE_APEX_H
