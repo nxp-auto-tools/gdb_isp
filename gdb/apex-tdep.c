@@ -202,13 +202,10 @@ apex_pc_to_imem_addr (ULONGEST pc, ULONGEST dm_start){
 static CORE_ADDR
 apex_read_pc (struct regcache* regcache){
 
-	  ULONGEST dm_start_temp, pm_start_temp, pc;
+	  ULONGEST dm_start_temp, pc;
 	  regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
 	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start_temp);
 	  apex_apu_data_mem_start = (CORE_ADDR)(dm_start_temp & 0xFFFFFFFF);
-	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_pm_start_regnum, &pm_start_temp);
-	  apex_apu_prog_mem_start = (CORE_ADDR)(pm_start_temp & 0xFFFFFFFF);
-
 	  return (CORE_ADDR)(pc & 0xFFFFFFFF);
 }
 
@@ -545,9 +542,6 @@ apex_gdbarch_init (struct gdbarch_info info,
 
   /* Internal <-> external register number maps.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, apex_dwarf_reg_to_regnum);
-  set_gdbarch_adjust_dwarf2_addr (gdbarch, apex_adjust_dwarf2_addr);
-  set_gdbarch_adjust_dwarf2_line (gdbarch, apex_adjust_dwarf2_line);
-
 
   /* Functions to supply register information */
   set_gdbarch_register_name         (gdbarch, apex_register_name);
