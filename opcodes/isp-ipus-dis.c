@@ -624,8 +624,3 @@ print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
     return 4;
 }
 
-int
-print_insn_isp_ipuv(bfd_vma addr, disassemble_info *info)
-{
-    return -1;
-}
