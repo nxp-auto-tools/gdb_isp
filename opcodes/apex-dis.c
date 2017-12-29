@@ -181,7 +181,7 @@ int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,opera
 
 int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
 	unsigned int index;
-	long imm;
+	int imm;
 	char value_string [12];
 	memset (value_string,0,12);
 	strcat(string, instruction->name);
