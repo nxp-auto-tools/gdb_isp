@@ -126,8 +126,8 @@ int extract_vliw_operands (const apex_64_bit_opc_info_t* operation,operand* oper
 
 int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
 	unsigned int index;
-	char value_string [8];
-	memset (value_string,0,8);
+	char value_string [11];
+	memset (value_string,0,11);
 	strcat(string, instruction->name);
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
@@ -153,8 +153,8 @@ int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operand
 }
 int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,operand* operands, char* string){
 	unsigned int index;
-	char value_string [8];
-	memset (value_string,0,8);
+	char value_string [11];
+	memset (value_string,0,11);
 	strcat(string, instruction->name);
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
@@ -182,8 +182,8 @@ int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,opera
 int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
 	unsigned int index;
 	long imm;
-	char value_string [8];
-	memset (value_string,0,8);
+	char value_string [11];
+	memset (value_string,0,11);
 	strcat(string, instruction->name);
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
