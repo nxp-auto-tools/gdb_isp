@@ -7,7 +7,6 @@
 #include "libbfd.h"
 #include "elf-bfd.h"
 #include "elf/apex.h"
-#include "elf32-apex.h"
 //#define TARGET_LITTLE_SYM apex_elf32_def_vec
 //#define TARGET_LITTLE_NAME "elf32-apex"
 #ifndef TARGET_BIG_SYM
