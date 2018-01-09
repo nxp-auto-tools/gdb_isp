@@ -7,6 +7,6 @@
      notice and this notice are preserved.  -->
 
 <!DOCTYPE feature SYSTEM "gdb-target.dtd">
-<feature name="isp-ipuv-core-regs">
+<feature name="org.gnu.gdb.ipuv.apu.acp">
   <reg name="pc" bitsize="32" type="code_ptr" />
 </feature>
