@@ -265,6 +265,7 @@ case $basic_machine in
 	| hexagon \
 	| i370 | i860 | i960 | ia64 \
 	| ip2k | iq2000 \
+	| isp \
 	| k1om \
 	| le32 | le64 \
 	| lm32 \
@@ -389,6 +390,7 @@ case $basic_machine in
 	| hexagon-* \
 	| i*86-* | i860-* | i960-* | ia64-* \
 	| ip2k-* | iq2000-* \
+	| isp*-* \
 	| k1om-* \
 	| le32-* | le64-* \
 	| lm32-* \
@@ -1637,6 +1639,13 @@ case $basic_machine in
 	*-ibm)
 		os=-aix
 		;;
+	#ISP
+	isp*-bare)
+		os=-none
+		;;
+	isp*-linux)
+		os=-linux
+		;;
 	*-knuth)
 		os=-mmixware
 		;;
@@ -1798,6 +1807,9 @@ case $basic_machine in
 				;;
 			-vos*)
 				vendor=stratus
+				;;
+			-isp*)
+				vendor=nxp
 				;;
 		esac
 		basic_machine=`echo $basic_machine | sed "s/unknown/$vendor/"`

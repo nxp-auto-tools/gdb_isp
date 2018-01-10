@@ -48,6 +48,7 @@
 #define ARCH_ia64
 #define ARCH_ip2k
 #define ARCH_iq2000
+#define ARCH_isp
 #define ARCH_lm32
 #define ARCH_m32c
 #define ARCH_m32r
@@ -234,6 +235,14 @@ disassembler (bfd *abfd)
 #ifdef ARCH_ip2k
     case bfd_arch_ip2k:
       disassemble = print_insn_ip2k;
+      break;
+#endif
+#ifdef ARCH_isp
+    case bfd_arch_isp:
+      if (bfd_get_mach(abfd) == bfd_mach_isp_ipus)
+        disassemble = print_insn_isp_ipus;
+      else if (bfd_get_mach(abfd) == bfd_mach_isp_ipuv)
+        disassemble = print_insn_isp_ipuv;
       break;
 #endif
 #ifdef ARCH_epiphany

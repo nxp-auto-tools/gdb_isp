@@ -259,6 +259,8 @@ extern int print_insn_i960		(bfd_vma, disassemble_info *);
 extern int print_insn_ia64		(bfd_vma, disassemble_info *);
 extern int print_insn_ip2k		(bfd_vma, disassemble_info *);
 extern int print_insn_iq2000		(bfd_vma, disassemble_info *);
+extern int print_insn_isp_ipus		(bfd_vma, disassemble_info *);
+extern int print_insn_isp_ipuv		(bfd_vma, disassemble_info *);
 extern int print_insn_little_arm	(bfd_vma, disassemble_info *);
 extern int print_insn_little_mips	(bfd_vma, disassemble_info *);
 extern int print_insn_little_nios2	(bfd_vma, disassemble_info *);
