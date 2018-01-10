@@ -67,6 +67,21 @@ isp_read_pc (struct regcache *regcache)
   return  pc;
 }
 
+static CORE_ADDR
+isp_skip_prologue (struct gdbarch *gdbarch, CORE_ADDR start_pc)
+{
+  return 0;
+}
+
+static const gdb_byte *
+isp_breakpoint_from_pc (struct gdbarch *gdbarch, CORE_ADDR *pc, int *len)
+{
+  static const gdb_byte break_insn[] = { 0x91 };
+
+  *len = sizeof (break_insn);
+  return break_insn;
+}
+
 
 struct isp_unwind_cache
 {
@@ -137,7 +152,6 @@ isp_frame_prev_register (struct frame_info *this_frame,
 
   /* If we are asked to unwind the PC, then we need to unwind PC ? */
   if (regnum == ISP_PC_REGNUM)
-      //return apex_prev_pc_register(this_frame);
 	  return frame_unwind_got_register(this_frame,regnum, regnum);
 
   return frame_unwind_got_register (this_frame, regnum, regnum);
@@ -160,7 +174,7 @@ static tdesc_arch_data * validate_reg_ipus(const struct target_desc *tdesc){
     int valid_p, i;
 
 
-    feature = tdesc_find_feature (tdesc, "org.gnu.gdb.ipus.apu.acp");
+    feature = tdesc_find_feature (tdesc, "org.gnu.gdb.isp.ipus");
     if (feature == NULL)
         return NULL;
 
@@ -184,7 +198,7 @@ static tdesc_arch_data * validate_reg_ipuv(const struct target_desc *tdesc){
     int valid_p, i;
 
 
-    feature = tdesc_find_feature (tdesc, "org.gnu.gdb.ipuv.apu.acp");
+    feature = tdesc_find_feature (tdesc, "org.gnu.gdb.isp.ipuv");
     if (feature == NULL)
         return NULL;
 
@@ -251,6 +265,11 @@ isp_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
     set_gdbarch_read_pc(gdbarch, isp_read_pc);
     set_gdbarch_pc_regnum (gdbarch, ISP_PC_REGNUM);
     frame_unwind_append_unwinder (gdbarch, &isp_frame_unwind);
+	
+	//Set of dummy functions to avoid internal checks
+	set_gdbarch_skip_prologue(gdbarch, isp_skip_prologue);
+  	set_gdbarch_inner_than(gdbarch, core_addr_lessthan);
+  	set_gdbarch_breakpoint_from_pc(gdbarch, isp_breakpoint_from_pc);
     
     /*Associates registers description with arch*/
     if (tdesc_data)

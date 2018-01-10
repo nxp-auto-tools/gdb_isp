@@ -14,7 +14,7 @@ initialize_tdesc_isp_ipus (void)
 
   set_tdesc_architecture (result, bfd_scan_arch ("ipus"));
 
-  feature = tdesc_create_feature (result, "org.gnu.gdb.ipus.apu.acp");
+  feature = tdesc_create_feature (result, "org.gnu.gdb.isp.ipus");
   tdesc_create_reg (feature, "pc", 0, 1, NULL, 16, "uint16");
   
 

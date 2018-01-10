@@ -7,6 +7,6 @@
      notice and this notice are preserved.  -->
 
 <!DOCTYPE feature SYSTEM "gdb-target.dtd">
-<feature name="org.gnu.gdb.ipus.apu.acp">
+<feature name="org.gnu.gdb.isp.ipus">
   <reg name="pc" bitsize="16" type="uint16"/>
 </feature>

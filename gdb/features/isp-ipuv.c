@@ -14,7 +14,7 @@ initialize_tdesc_isp_ipuv (void)
 
   set_tdesc_architecture (result, bfd_scan_arch ("isp-ipuv"));
 
-  feature = tdesc_create_feature (result, "org.gnu.gdb.ipuv.apu.acp");
+  feature = tdesc_create_feature (result, "org.gnu.gdb.isp.ipuv");
   tdesc_create_reg (feature, "pc", 0, 1, NULL, 32, "code_ptr");
   
 
