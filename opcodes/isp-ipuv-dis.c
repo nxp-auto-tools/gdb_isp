@@ -1,7 +1,7 @@
 /* Single instruction disassembler for the ISP.
 
    Copyright (C) 2015-2017 Free Software Foundation, Inc.
-   Copyright 2018 NXP, APEX support.
+   Copyright 2018 NXP, ISP support.
 
    This file is part of the GNU opcodes library.
 
