@@ -1,7 +1,6 @@
 /* Remote target communications for serial-line targets in custom GDB protocol
 
    Copyright (C) 1988-2017 Free Software Foundation, Inc.
-   Copyright 2018 NXP, ISP support.
 
    This file is part of GDB.
 
