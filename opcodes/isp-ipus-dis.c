@@ -601,9 +601,8 @@ char* ispDisassemle(unsigned ins, bfd_vma addr, disassemble_info *info){
 int
 print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
 {
-    unsigned buffer[1];
-    
-    int status;
+    bfd_byte buffer [4];
+    int status,i;
     int buf_size = sizeof(buffer);
     if (info->buffer_length) {
         if (addr+buf_size > (info->buffer_vma+info->buffer_length)) {
@@ -611,12 +610,19 @@ print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
             memset(buffer,0,buf_size);
         }
     }
-    status = (*info->read_memory_func) (addr, (bfd_byte*)buffer, buf_size, info);
-    if (status != 0) {
-        (*info->memory_error_func) (status, addr, info);
-        return -1;
+
+    /* Reading byte by byte. read_memory_funct got
+     * a feature pass NO error if only first byte
+     * possible to read and the other are unaccessible*/
+
+    for (i=0;i<buf_size;i++){
+    	bfd_byte* _link = &buffer[i];
+		 status = (*info->read_memory_func) (++addr, _link, 1, info);
+		 if (status != 0) {
+			 (*info->memory_error_func) (status, addr, info);
+			 return 0;
+		 }
     }
-    
 
     insn[0] = bfd_getl32 (buffer);
 
