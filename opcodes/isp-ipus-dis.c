@@ -602,7 +602,7 @@ int
 print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
 {
     bfd_byte buffer [4];
-    int status;
+    int status,i;
     int buf_size = sizeof(buffer);
     if (info->buffer_length) {
         if (addr+buf_size > (info->buffer_vma+info->buffer_length)) {
@@ -615,7 +615,7 @@ print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
      * a feature pass NO error if only first byte
      * possible to read and the other are unaccessible*/
 
-    for (int i=0;i<buf_size;i++){
+    for (i=0;i<buf_size;i++){
     	bfd_byte* _link = &buffer[i];
 		 status = (*info->read_memory_func) (++addr, _link, 1, info);
 		 if (status != 0) {
