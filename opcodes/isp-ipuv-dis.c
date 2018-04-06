@@ -312,8 +312,7 @@ char* ipuvDisassemle(unsigned ins, bfd_vma addr, disassemble_info *info){
 int
 print_insn_isp_ipuv (bfd_vma addr, disassemble_info *info)
 {
-    unsigned buffer[1];
-    
+    bfd_byte buffer [4];
     int status;
     int buf_size = sizeof(buffer);
     if (info->buffer_length) {
@@ -322,17 +321,24 @@ print_insn_isp_ipuv (bfd_vma addr, disassemble_info *info)
             memset(buffer,0,buf_size);
         }
     }
-    status = (*info->read_memory_func) (addr, (bfd_byte*)buffer, buf_size, info);
-    if (status != 0) {
-        (*info->memory_error_func) (status, addr, info);
-        return -1;
+
+    /* Reading byte by byte. read_memory_funct got
+     * a feature pass NO error if only first byte
+     * possible to read and the other are unaccessible*/
+
+    for (int i=0;i<buf_size;i++){
+    	bfd_byte* _link = &buffer[i];
+		 status = (*info->read_memory_func) (++addr, _link, 1, info);
+		 if (status != 0) {
+			 (*info->memory_error_func) (status, addr, info);
+			 return 0;
+		 }
     }
-    
 
     insn[0] = bfd_getl32 (buffer);
 
 
-    (*info->fprintf_func) (info->stream, (ipuvDisassemle(insn[0], addr, info)) );
+    (*info->fprintf_func) (info->stream, (ispDisassemle(insn[0], addr, info)) );
     
     //Instruction size
     return 4;
