@@ -338,8 +338,8 @@ print_insn_isp_ipuv (bfd_vma addr, disassemble_info *info)
     insn[0] = bfd_getl32 (buffer);
 
 
-    (*info->fprintf_func) (info->stream, (ispDisassemle(insn[0], addr, info)) );
-    
+    (*info->fprintf_func) (info->stream, (ipuvDisassemle(insn[0], addr, info)) );
+
     //Instruction size
     return 4;
 }
