@@ -32,6 +32,8 @@
 #include <setjmp.h>
 
 #define INSTR_BUFFER    4
+#define    WORD_SIZE 	4 //bytes per word
+
 //#define OPCODE_BUFFER   INSTR_BUFFER*4
 
 #define BUF_SZ 200
@@ -312,13 +314,13 @@ char* ipuvDisassemle(unsigned ins, bfd_vma addr, disassemble_info *info){
 int
 print_insn_isp_ipuv (bfd_vma addr, disassemble_info *info)
 {
-    bfd_byte buffer [INSTR_BUFFER];
+    bfd_byte buffer [WORD_SIZE];
     int status,i;
     int buf_size = sizeof(buffer);
     if (info->buffer_length) {
         if (addr+buf_size > (info->buffer_vma+info->buffer_length)) {
             buf_size = (info->buffer_vma+info->buffer_length)-addr;
-            if (buf_size > INSTR_BUFFER){buf_size = INSTR_BUFFER;}
+            if (buf_size > WORD_SIZE){buf_size = WORD_SIZE;}
             memset(buffer,0,buf_size);
         }
     }
