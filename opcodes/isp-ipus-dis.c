@@ -607,8 +607,7 @@ print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
     if (info->buffer_length) {
         if (addr+buf_size > (info->buffer_vma+info->buffer_length)) {
             buf_size = (info->buffer_vma+info->buffer_length)-addr;
-            if (buf_size > 4)
-            	buf_size = 4;
+            if (buf_size > 4){buf_size = 4;}
             memset(buffer,0,buf_size);
         }
     }
