@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 
-#define INSTR_BUFFER    4
+#define INSTR_BUFFER    4 // num of bytes
 //#define OPCODE_BUFFER   INSTR_BUFFER*4
 
 #define BUF_SZ 200
@@ -601,13 +601,13 @@ char* ispDisassemle(unsigned ins, bfd_vma addr, disassemble_info *info){
 int
 print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
 {
-    bfd_byte buffer [4];
+    bfd_byte buffer [INSTR_BUFFER];
     int status,i;
     int buf_size = sizeof(buffer);
     if (info->buffer_length) {
         if (addr+buf_size > (info->buffer_vma+info->buffer_length)) {
             buf_size = (info->buffer_vma+info->buffer_length)-addr;
-            if (buf_size > 4){buf_size = 4;}
+            if (buf_size > INSTR_BUFFER){buf_size = INSTR_BUFFER;}
             memset(buffer,0,buf_size);
         }
     }
