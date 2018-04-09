@@ -33,7 +33,6 @@
 
 #define INSTR_BUFFER    4
 #define    WORD_SIZE 	4 //bytes per word
-
 //#define OPCODE_BUFFER   INSTR_BUFFER*4
 
 #define BUF_SZ 200
