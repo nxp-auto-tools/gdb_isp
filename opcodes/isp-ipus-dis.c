@@ -619,10 +619,10 @@ print_insn_isp_ipus (bfd_vma addr, disassemble_info *info)
 
     for (i=0;i<buf_size;i++){
     	bfd_byte* _link = &buffer[i];
-		 status = (*info->read_memory_func) (++addr, _link, 1, info);
+		 status = (*info->read_memory_func) (addr++, _link, 1, info);
 		 if (status != 0) {
-			 (*info->memory_error_func) (status, addr, info);
-			 return 0;
+			 //(*info->memory_error_func) (status, addr, info);
+			 return -1;
 		 }
     }
 
