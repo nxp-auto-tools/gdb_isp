@@ -41,7 +41,7 @@ static void isp_info_to_howto_ (bfd *abfd, arelent *cache_ptr, Elf_Internal_Rela
 }
 
 #define TARGET_LITTLE_SYM		isp_elf32_le_vec
-#define TARGET_LITTLE_NAME		"elf-le-isp"
+#define TARGET_LITTLE_NAME		"elf32-le-isp"
 #define ELF_ARCH		        bfd_arch_isp
 #define ELF_MACHINE_CODE	    EM_ISP
 #define ELF_MACHINE_ALT1        EM_AARCH64

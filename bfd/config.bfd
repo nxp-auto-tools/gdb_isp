@@ -850,10 +850,6 @@ case "${targ}" in
     targ_defvec=iq2000_elf32_vec
     ;;
     
-#  isp*)
-#    targ_defvec=isp_elf_le_vec
-#    ;;
-
   lm32-*-elf | lm32-*-rtems*)
     targ_defvec=lm32_elf32_vec
     targ_selvecs=lm32_elf32_fdpic_vec
