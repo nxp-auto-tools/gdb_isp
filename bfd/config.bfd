@@ -175,7 +175,7 @@ case "${targ}" in
 
 # START OF targmatch.h
 #ifdef BFD64
-  isp-*-elf*)
+  isp*)
     targ_defvec=isp_elf64_le_vec
     targ_selvecs="isp_elf32_le_vec isp_elf64_le_vec"
     want64=true
