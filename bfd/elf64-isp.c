@@ -40,15 +40,13 @@ static void isp_info_to_howto_ (bfd *abfd, arelent *cache_ptr, Elf_Internal_Rela
     return;
 }
 
-#define TARGET_LITTLE_SYM		isp_elf32_le_vec
-#define TARGET_LITTLE_NAME		"elf-le-isp"
+#define TARGET_LITTLE_SYM		isp_elf64_le_vec
+#define TARGET_LITTLE_NAME		"elf64-le-isp"
 #define ELF_ARCH		        bfd_arch_isp
 #define ELF_MACHINE_CODE	    EM_ISP
-#define ELF_MACHINE_ALT1        EM_AARCH64
-#define ELF_MACHINE_ALT2        EM_ARM
 #define ELF_MAXPAGESIZE  	    1 /* FIXME: This number is wrong,  It should be the page size in bytes.  */
-#define bfd_elf32_bfd_reloc_type_lookup bfd_default_reloc_type_lookup
-#define bfd_elf32_bfd_reloc_name_lookup _bfd_norelocs_bfd_reloc_name_lookup
+#define bfd_elf64_bfd_reloc_type_lookup bfd_default_reloc_type_lookup
+#define bfd_elf64_bfd_reloc_name_lookup _bfd_norelocs_bfd_reloc_name_lookup
 #define elf_info_to_howto		isp_info_to_howto_
 
-#include "elf32-target.h"
+#include "elf64-target.h"

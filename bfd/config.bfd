@@ -175,6 +175,11 @@ case "${targ}" in
 
 # START OF targmatch.h
 #ifdef BFD64
+  isp-*-elf*)
+    targ_defvec=isp_elf64_le_vec
+    targ_selvecs="isp_elf32_le_vec isp_elf64_le_vec"
+    want64=true
+    ;;
   aarch64-*-darwin*)
     targ_defvec=aarch64_mach_o_vec
     targ_selvecs="arm_mach_o_vec mach_o_le_vec mach_o_be_vec mach_o_fat_vec"
@@ -845,9 +850,9 @@ case "${targ}" in
     targ_defvec=iq2000_elf32_vec
     ;;
     
-  isp*)
-    targ_defvec=isp_elf32_le_vec
-    ;;
+#  isp*)
+#    targ_defvec=isp_elf_le_vec
+#    ;;
 
   lm32-*-elf | lm32-*-rtems*)
     targ_defvec=lm32_elf32_vec
