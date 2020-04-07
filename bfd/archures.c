@@ -1,7 +1,7 @@
 /* BFD library support routines for architectures.
    Copyright (C) 1990-2016 Free Software Foundation, Inc.
    Hacked by John Gilmore and Steve Chamberlain of Cygnus Support.
-   Copyright 2018 NXP, ISP support.
+   Contributed by NXP, ISP support.
 
    This file is part of BFD, the Binary File Descriptor library.
 

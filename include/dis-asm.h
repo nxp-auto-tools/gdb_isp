@@ -1,7 +1,7 @@
 /* Interface between the opcode library and its callers.
 
    Copyright (C) 1999-2016 Free Software Foundation, Inc.
-   Copyright 2018 NXP, ISP support.
+   Contributed by NXP, ISP support.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
