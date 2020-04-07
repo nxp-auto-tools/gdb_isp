@@ -9,7 +9,7 @@
 
    Copyright (C) 1990-2016 Free Software Foundation, Inc.
    Contributed by Cygnus Support.
-   Copyright 2018 NXP, ISP support.
+   Contributed by NXP, ISP support.
 
    This file is part of BFD, the Binary File Descriptor library.
 

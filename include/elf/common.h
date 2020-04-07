@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   Copyright 2018 NXP, ISP support.
+   Contributed by NXP, ISP support.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and

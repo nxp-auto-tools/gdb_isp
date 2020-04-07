@@ -1,6 +1,6 @@
 /* Select disassembly routine for specified architecture.
    Copyright (C) 1994-2016 Free Software Foundation, Inc.
-   Copyright 2018 NXP, ISP support.
+   Contributed by NXP, ISP support.
 
    This file is part of the GNU opcodes library.
 

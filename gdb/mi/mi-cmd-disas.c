@@ -1,7 +1,7 @@
 /* MI Command Set - disassemble commands.
    Copyright (C) 2000-2017 Free Software Foundation, Inc.
    Contributed by Cygnus Solutions (a Red Hat company).
-   Copyright 2018 NXP, ISP support.
+   Contributed by NXP, ISP support.
 
    This file is part of GDB.
 
